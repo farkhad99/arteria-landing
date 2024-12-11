@@ -1,12 +1,11 @@
+const path = require('path')
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
 })
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
+// const withBundleAnalyzer = require('@next/bundle-analyzer')({
+//   enabled: process.env.ANALYZE === 'true',
+// })
 const million = require('million/compiler')
-
-const path = require('path')
 
 const nextConfig = {
   reactStrictMode: true,
@@ -161,7 +160,7 @@ const nextConfig = {
 }
 
 const nextConfigWrapper = () => {
-  const plugins = [withPWA, withBundleAnalyzer]
+  const plugins = [withPWA]
   return plugins.reduce((acc, plugin) => plugin(acc), {
     ...nextConfig,
   })

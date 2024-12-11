@@ -9,6 +9,7 @@
     "@next/next/no-page-custom-font": "off",
     "array-callback-return": "off",
     "no-useless-escape": "off",
-    "no-inner-declarations": "off"
+    "no-inner-declarations": "off",
+    "@typescript-eslint/no-var-requires": "off"
   }
 }
