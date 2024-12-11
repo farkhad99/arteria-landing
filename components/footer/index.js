@@ -13,7 +13,7 @@ export function Footer({ className, style, links, studioInfo }) {
       <Separator className="layout-block" />
       <div className={cn(s.footer, 'layout-grid', className)} style={style}>
         <a
-          href="/StudioFreight-Capabilities.pdf"
+          href="/Arteria-Capabilities.pdf"
           download
           className={cn(s.column, 'p-s text-accent')}
           onClick={() => va.track('Downloaded Capabilities deck')}

@@ -6,6 +6,8 @@ import { ComposableImage } from 'components/composable-image'
 import { ClientOnly } from 'components/isomorphic'
 import { LayoutMobile } from 'components/layout-mobile'
 import { ScrollableBox } from 'components/scrollable-box'
+import { fetchCmsQuery } from 'contentful/api'
+import { projectListEntryQuery } from 'contentful/queries/home.graphql'
 import { renderer } from 'contentful/renderer'
 import { Layout } from 'layouts/default'
 import { slugify } from 'lib/slugify'
@@ -78,7 +80,21 @@ export default function Home({ studioFreight, footer, contact, projects }) {
                 About
               </p>
               <ScrollableBox className={s.description}>
-                {renderer(studioFreight.about)}
+                {/* {renderer(studioFreight.about)} */}
+                ArteriaStudios is a subscription-based creative studio
+                empowering brands and startups with design solutions that scale,
+                adapt, and inspire. We’re more than just designers—we’re your
+                partners in building brands, crafting websites, and launching
+                ideas that leave a lasting impression. Our clients come from
+                diverse industries but share a common drive: to stand out,
+                connect authentically, and create meaningful impact. At Arteria,
+                we to exceed them with every project, delivering creative
+                solutions that elevate businesses to new heights. Whether you're
+                a startup finding your footing or an established brand seeking a
+                fresh perspective, ArteriaStudios is here to guide your journey
+                with innovative design, strategic thinking, and a relentless
+                commitment to your success. Let's create something extraordinary
+                together.
               </ScrollableBox>
             </section>
             <section className={s.projects}>
@@ -270,24 +286,34 @@ export default function Home({ studioFreight, footer, contact, projects }) {
 }
 
 export async function getStaticProps({ preview = false }) {
-  // const [{ studioFreight }, { footer }, { contact }, { projectList }] =
-  //   await Promise.all([
-  //     fetchCmsQuery(studioFreightEntryQuery, {
-  //       preview,
-  //     }),
-  //     fetchCmsQuery(footerEntryQuery, {
-  //       preview,
-  //     }),
-  //     fetchCmsQuery(contactEntryQuery, {
-  //       preview,
-  //     }),
-  //     fetchCmsQuery(projectListEntryQuery, {
-  //       preview,
-  //     }),
-  //   ])
+  // const [
+  //   // { studioFreight }, { footer }, { contact },
+  //   { projects },
+  // ] = await Promise.all([
+  //   // fetchCmsQuery(studioFreightEntryQuery, {
+  //   //   preview,
+  //   // }),
+  //   // fetchCmsQuery(footerEntryQuery, {
+  //   //   preview,
+  //   // }),
+  //   // fetchCmsQuery(contactEntryQuery, {
+  //   //   preview,
+  //   // }),
+  //   fetchCmsQuery(projectListEntryQuery, {
+  //     preview,
+  //   }),
+  // ])
+  const response = await fetchCmsQuery(projectListEntryQuery, {
+    preview,
+  })
 
-  // contact.form = await getForm(contact.form)
-  console.log('studioFreight', preview)
+  const projectList = []
+  if (response?.list?.itemsCollection?.items) {
+    response.list.itemsCollection.items.forEach((item) => {
+      console.log(response.list.itemsCollection.items)
+      projectList.push({ ...item.json, sys: { id: item.sys.id } })
+    })
+  }
 
   return {
     props: {
@@ -335,9 +361,9 @@ export async function getStaticProps({ preview = false }) {
           fields: [{ name: 'dwdw', type: 'dwdw', portalId: 'dqwdqwdwqdqw' }],
           action: 'dwdw',
         },
-        description: 'dwdw',
-        thankYouMessage: 'dwdw',
-        body: 'dwdw',
+        description: 'Description',
+        thankYouMessage: 'Thank you',
+        body: 'Body',
         faqsCollection: {
           items: [{ title: 'dwdw', body: 'dwdw', content: 'wdwdqdq' }],
           form: {
@@ -350,58 +376,63 @@ export async function getStaticProps({ preview = false }) {
         },
       },
       projects: {
-        items: [
-          {
-            name: 'Path Robotics 4A',
-            industry: 'Manufacturing',
-            link: 'dwdw',
-            sys: {
-              id: 'wdqdwq',
-            },
-            assetsCollection: {
-              items: [
-                {
-                  imagesCollection: {
-                    items: [
-                      {
-                        url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
-                      },
-                    ],
-                  },
-                  services: ['dwdw'],
-                  stack: ['dwdw'],
-                  testimonial: 'dwdw',
-                  body: 'dwdw',
+        items: projectList.length
+          ? projectList
+          : [
+              {
+                name: 'Path Robotics 4A',
+                industry: 'Manufacturing',
+                link: 'dwdw',
+                sys: {
+                  id: 'wdqdwq',
                 },
-              ],
-            },
-          },
-          {
-            name: 'Path Robotics 2A',
-            industry: 'Manufacturing2',
-            link: 'dwdw',
-            sys: {
-              id: 'dq;ldmqw;ldqw',
-            },
-            assetsCollection: {
-              items: [
-                {
-                  imagesCollection: {
-                    items: [
-                      {
-                        url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
+                testimonial: 'okay i got u',
+                assetsCollection: {
+                  items: [
+                    {
+                      imagesCollection: {
+                        items: [
+                          {
+                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
+                          },
+                          {
+                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
+                          },
+                        ],
                       },
-                    ],
-                  },
-                  services: ['dwdw'],
-                  stack: ['dwdw'],
-                  testimonial: 'dwdw',
-                  body: 'dwdw',
+                    },
+                  ],
                 },
-              ],
-            },
-          },
-        ],
+                services: ['dwdw'],
+                stack: ['dwdw'],
+                body: 'dwdw',
+              },
+              {
+                name: 'Path Robotics 2A',
+                industry: 'Manufacturing2',
+                link: 'dwdw',
+                sys: {
+                  id: 'dq;ldmqw;ldqw',
+                },
+                assetsCollection: {
+                  items: [
+                    {
+                      imagesCollection: {
+                        items: [
+                          {
+                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
+                          },
+                        ],
+                      },
+                      services: ['dwdw'],
+                      stack: ['dwdw'],
+                      testimonial: 'dwdw',
+                      body: 'dwdw',
+                    },
+                  ],
+                },
+              },
+            ],
       },
       id: 'home',
     },

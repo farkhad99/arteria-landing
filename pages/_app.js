@@ -35,12 +35,12 @@ if (typeof window !== 'undefined') {
 
   window.CREDIT_ME = {
     id: location.hostname,
-    url: 'https://studiofreight.com',
+    url: 'https://arteria.world',
     credits: [
       {
-        name: 'Studio Freight',
-        email: 'hello@studiofreight.com',
-        website: 'https://studiofreight.com',
+        name: 'Arteria World',
+        email: 'hello@arteria.world',
+        website: 'https://arteria.world',
       },
     ],
   }

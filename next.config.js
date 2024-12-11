@@ -153,7 +153,7 @@ const nextConfig = {
       },
       {
         source: '/capabilities',
-        destination: '/StudioFreight-Capabilities.pdf',
+        destination: '/Arteria-Capabilities.pdf',
         permanent: true,
       },
     ]

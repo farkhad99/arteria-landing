@@ -1,7 +1,7 @@
 {
-  "name": "Studio Freight",
-  "short_name": "SF",
-  "description": "A design studio built on principle. We grow brands by making them easy to understand and impossible to ignore. Our creative experts support with branding, art direction, strategy, web design, web development, packaging, copywriting, lettering, illustration, photography, murals, signage, video, and beyond.",
+  "name": "Arteria",
+  "short_name": "AS",
+  "description": "ArteriaStudios is a subscription-based creative studio empowering brands and startups with design solutions that scale, adapt, and inspire. We’re more than just designers—we’re your partners in building brands, crafting websites, and launching ideas that leave a lasting impression. Our clients come from diverse industries but share a common drive: to stand out, connect authentically, and create meaningful impact. At Arteria, we to exceed them with every project, delivering creative solutions that elevate businesses to new heights. Whether you're a startup finding your footing or an established brand seeking a fresh perspective, ArteriaStudios is here to guide your journey with innovative design, strategic thinking, and a relentless commitment to your success. Let's create something extraordinary together.",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -16,7 +16,7 @@
       "purpose": "any"
     }
   ],
-  "theme_color": "#4160ff",
+  "theme_color": "#A41403",
   "background_color": "#000000",
   "start_url": "/",
   "scope": ".",

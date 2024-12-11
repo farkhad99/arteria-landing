@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-document-import-in-page */
+ 
 import { Head, Html, Main, NextScript } from 'next/document'
 
 export default function Document() {

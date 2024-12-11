@@ -52,34 +52,16 @@ query contactEntryQuery($preview: Boolean!) {
 }
 
 query projectListEntryQuery($preview: Boolean!) {
-  projectList(id: "6nQzRceL1TxfIzIYatjR8T", preview: $preview) {
+  list(id: "345LcqjT6FboJz5ELyuuEo", preview: $preview) {
     sys {
       id
     }
-    listCollection {
+    itemsCollection {
       items {
         sys {
           id
         }
-        name
-        industry
-        body {
-          json
-        }
-        testimonial
-        assetsCollection(limit: 20) {
-          items {
-            imagesCollection(limit: 20) {
-              items {
-                url
-                title
-              }
-            }
-          }
-        }
-        services
-        stack
-        link
+        json
       }
     }
   }
