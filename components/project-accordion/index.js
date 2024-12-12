@@ -19,7 +19,7 @@ export const ProjectAccordion = ({ data }) => {
       <p className="p text-bold text-uppercase text-muted">Projects</p>
 
       <Accordion.Root type="single" className={s['accordion-root']} collapsible>
-        {data.map((item, i) => (
+        {data?.map((item, i) => (
           <Accordion.Item value={slugify(item.name)} key={i} className={s.item}>
             <Accordion.Header asChild>
               <Accordion.Trigger

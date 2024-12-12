@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request'
 
 export const fetchCmsQuery = async (query, variables) => {
   try {
+    console.log(process.env.NEXT_CONTENTFUL_ACCESS_TOKEN)
     const endpoint = `https://graphql.contentful.com/content/v1/spaces/${process.env.NEXT_CONTENTFUL_SPACE_ID}/environments/master`
     const graphQLClient = new GraphQLClient(endpoint, {
       headers: {
@@ -15,7 +16,7 @@ export const fetchCmsQuery = async (query, variables) => {
     return await graphQLClient.request(query, variables)
   } catch (error) {
     console.error(
-      `There was a problem retrieving entries with the query ${query}`
+      `There was a problem retrieving entries with the query ${query}`,
     )
     console.error(error)
   }
