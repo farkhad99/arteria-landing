@@ -1,7 +1,7 @@
 const path = require('path')
-const withPWA = require('@ducanh2912/next-pwa').default({
-  dest: 'public',
-})
+// const withPWA = require('@ducanh2912/next-pwa').default({
+//   dest: 'public',
+// })
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({
 //   enabled: process.env.ANALYZE === 'true',
 // })
@@ -160,7 +160,7 @@ const nextConfig = {
 }
 
 const nextConfigWrapper = () => {
-  const plugins = [withPWA]
+  const plugins = []
   return plugins.reduce((acc, plugin) => plugin(acc), {
     ...nextConfig,
   })
