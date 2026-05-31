@@ -1,8 +1,0 @@
-fragment Metadata on Metadata {
-  title
-  description
-  keywords
-  og: ogMedia {
-    ...Image
-  }
-}

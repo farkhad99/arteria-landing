@@ -91,10 +91,65 @@
 }
 
 .form {
+  display: grid;
+  gap: mobile-vw(12px);
+
   @include desktop {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: desktop-vw(24px);
+    row-gap: desktop-vw(12px);
+  }
+
+  .full {
+    @include desktop {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .label {
+    display: flex;
+    flex-direction: column;
+    gap: mobile-vw(8px);
+    text-transform: uppercase;
+    color: var(--grey);
+    font-size: mobile-vw(11px);
+
+    @include desktop {
+      gap: desktop-vw(8px);
+      font-size: desktop-vw(11px);
+    }
+  }
+
+  .input,
+  .textarea {
+    border: 1px solid var(--grey);
+    background: transparent;
+    color: var(--white);
+    padding: mobile-vw(10px);
+    width: 100%;
+
+    @include desktop {
+      padding: desktop-vw(10px);
+    }
+  }
+
+  .textarea {
+    min-height: mobile-vw(120px);
+
+    @include desktop {
+      min-height: desktop-vw(120px);
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: mobile-vw(12px);
+
+    @include desktop {
+      gap: desktop-vw(12px);
+    }
   }
 }
 

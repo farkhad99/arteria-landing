@@ -5,8 +5,10 @@ import cn from 'clsx'
 import { Separator } from 'components/separator'
 import s from './footer.module.scss'
 
-export function Footer({ className, style, links, studioInfo }) {
+export function Footer({ className, style, links }) {
   const isMobile = useMediaQuery('(max-width: 800px)')
+  const footerPhone = '+998996924479'
+  const footerEmail = 'segeayupov@gmail.com'
 
   return (
     <footer className={s.container}>
@@ -82,13 +84,13 @@ export function Footer({ className, style, links, studioInfo }) {
 
         <ul className={s.column}>
           <li>
-            <Link className="p-s decorate" href={`tel:${studioInfo.phone}`}>
-              P: {studioInfo.phone}
+            <Link className="p-s decorate" href={`tel:${footerPhone}`}>
+              P: {footerPhone}
             </Link>
           </li>
           <li>
-            <Link className="p-s decorate" href={`mailto:${studioInfo.email}`}>
-              E: {studioInfo.email}
+            <Link className="p-s decorate" href={`mailto:${footerEmail}`}>
+              E: {footerEmail}
             </Link>
           </li>
         </ul>

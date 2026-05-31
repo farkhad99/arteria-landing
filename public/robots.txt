@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://arteria.world
+Host: http://www.example.com
 
 # Sitemaps
-Sitemap: https://arteria.world/sitemap.xml
+Sitemap: http://www.example.com/sitemap.xml

@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ContactRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String?
+  phone     String?
+  message   String
+  source    String?  @default("landing_contact_form")
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  industry    String?
+  body        String?
+  testimonial String?
+  services    String[]
+  stack       String[]
+  link        String?
+  mediaLayout MediaLayout   @default(TWO_COLUMNS)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  media       ProjectMedia[]
+}
+
+model ProjectMedia {
+  id          String   @id @default(cuid())
+  projectId   String
+  kind        MediaKind
+  title       String?
+  url         String
+  s3Key       String
+  contentType String?
+  createdAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+enum MediaLayout {
+  TWO_COLUMNS
+  FULL_WIDTH
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+}

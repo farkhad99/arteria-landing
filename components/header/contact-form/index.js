@@ -1,14 +1,11 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import cn from 'clsx'
-import { Hubspot } from 'components/hubspot'
 import { ScrollableBox } from 'components/scrollable-box'
 import { Separator } from 'components/separator'
-import { renderer } from 'contentful/faq-renderer'
-import { renderer as globalRenderer } from 'contentful/renderer'
 import { slugify } from 'lib/slugify'
 import { useStore } from 'lib/store'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import s from './contact-form.module.scss'
 
 export function ContactForm({ data }) {
@@ -32,6 +29,44 @@ export function ContactForm({ data }) {
       shallow: true,
     })
     if (showThanks) setShowThanks(false)
+  }
+  const [formState, setFormState] = useState({
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    message: '',
+  })
+  const [status, setStatus] = useState('')
+
+  const submitContact = async (event) => {
+    event.preventDefault()
+    setStatus('Submitting...')
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload.error || 'Failed to submit form')
+      }
+      setStatus(
+        payload.telegramSent
+          ? 'Message sent successfully.'
+          : 'Saved successfully. Telegram notification failed.',
+      )
+      setFormState({
+        name: '',
+        email: '',
+        company: '',
+        phone: '',
+        message: '',
+      })
+    } catch (error) {
+      setStatus(error.message)
+    }
   }
 
   useEffect(() => {
@@ -62,17 +97,73 @@ export function ContactForm({ data }) {
         {showThanks ? (
           <ScrollableBox className={s.scrollable} shadow={false}>
             <div className={s.content}>
-              {globalRenderer(data.thankYouMessage)}
+              {/* {globalRenderer(data?.thankYouMessage)} */}
             </div>
           </ScrollableBox>
         ) : (
           <ScrollableBox className={s.scrollable} shadow={false}>
-            <div className={s.content}>{globalRenderer(data.description)}</div>
-            <Hubspot {...data.form} className={s.form}>
-              {({ ...helpers }) => (
-                <Hubspot.Form className={s.form} {...helpers} />
-              )}
-            </Hubspot>
+            <form className={s.form} onSubmit={submitContact}>
+              <label className={s.label}>
+                Name
+                <input
+                  className={s.input}
+                  value={formState.name}
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, name: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <label className={s.label}>
+                Email
+                <input
+                  className={s.input}
+                  type="email"
+                  value={formState.email}
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, email: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <label className={s.label}>
+                Company
+                <input
+                  className={s.input}
+                  value={formState.company}
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, company: event.target.value }))
+                  }
+                />
+              </label>
+              <label className={s.label}>
+                Phone
+                <input
+                  className={s.input}
+                  value={formState.phone}
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, phone: event.target.value }))
+                  }
+                />
+              </label>
+              <label className={cn(s.label, s.full)}>
+                Message
+                <textarea
+                  className={s.textarea}
+                  value={formState.message}
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, message: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <div className={cn(s.full, s.actions)}>
+                <button className="button" type="submit">
+                  Send request
+                </button>
+                {status && <p className="p-s text-muted">{status}</p>}
+              </div>
+            </form>
             <div className={s.accordion}>
               <p className="p text-uppercase text-bold text-muted">FAQ</p>
               <Accordion.Root
@@ -80,7 +171,7 @@ export function ContactForm({ data }) {
                 className={s['accordion-root']}
                 collapsible
               >
-                {data.faqsCollection.items.map((faq, i) => (
+                {(data?.faqsCollection?.items || []).map((faq, i) => (
                   <Accordion.Item
                     value={slugify(faq.title)}
                     key={i}
@@ -115,7 +206,7 @@ export function ContactForm({ data }) {
                       </Accordion.Trigger>
                     </Accordion.Header>
                     <Accordion.Content className={s['accordion-content']}>
-                      {renderer(faq.content)}
+                      {/* {renderer(faq.content)} */}
                     </Accordion.Content>
                   </Accordion.Item>
                 ))}

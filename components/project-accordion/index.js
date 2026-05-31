@@ -3,7 +3,7 @@ import { Link } from '@studio-freight/compono'
 import cn from 'clsx'
 import { ComposableImage } from 'components/composable-image'
 import Slider from 'components/slider'
-import { renderer } from 'contentful/renderer'
+import { renderProjectBody } from 'lib/render-project-body'
 import { slugify } from 'lib/slugify'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
@@ -13,6 +13,8 @@ const Arrow = dynamic(() => import('icons/arrow.svg'), { ssr: false })
 
 export const ProjectAccordion = ({ data }) => {
   const [active, setActive] = useState(0)
+
+  data = data.map((d) => (d.json ? { ...d.json, ...d } : d))
 
   return (
     <div className={s.accordion}>
@@ -74,7 +76,7 @@ export const ProjectAccordion = ({ data }) => {
                 </Link>
               )}
               {item.body && (
-                <div className={s.description}>{renderer(item.body)}</div>
+                <div className={s.description}>{renderProjectBody(item.body)}</div>
               )}
               {item.testimonial && (
                 <div className={s.testimonial}>

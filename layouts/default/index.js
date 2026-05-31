@@ -133,7 +133,7 @@ export function Layout({
         <Scrollbar />
         <Header principles={principles} contact={contactData} />
         <main className={s.main}>{children}</main>
-        <Footer links={footerLinks} studioInfo={studioInfo} />
+        <Footer links={footerLinks || []} studioInfo={studioInfo} />
       </div>
 
       {debug && (

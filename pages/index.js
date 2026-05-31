@@ -6,10 +6,9 @@ import { ComposableImage } from 'components/composable-image'
 import { ClientOnly } from 'components/isomorphic'
 import { LayoutMobile } from 'components/layout-mobile'
 import { ScrollableBox } from 'components/scrollable-box'
-import { fetchCmsQuery } from 'contentful/api'
-import { projectListEntryQuery } from 'contentful/queries/home.graphql'
-import { renderer } from 'contentful/renderer'
 import { Layout } from 'layouts/default'
+import { prisma } from 'lib/prisma'
+import { renderProjectBody } from 'lib/render-project-body'
 import { slugify } from 'lib/slugify'
 import { useStore } from 'lib/store'
 import dynamic from 'next/dynamic'
@@ -45,8 +44,10 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
       slugify(item.name).includes(searchTerm),
     )
 
-    setSelectedProject(matchingItem || projects.items[0])
-  }, [router.asPath])
+    if (projects.items.length > 0) {
+      setSelectedProject(matchingItem || projects.items[0])
+    }
+  }, [router.asPath, projects.items, setSelectedProject])
 
   useEffect(() => {
     if (selectedProject) {
@@ -134,6 +135,13 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
               </ScrollableBox>
             </section>
             <section className={s['project-details']}>
+              {!selectedProject ? (
+                <p className="p text-muted">
+                  No projects loaded. Check your database connection and run
+                  migrations.
+                </p>
+              ) : (
+              <>
               <div className={s.heading}>
                 <p
                   className={cn(
@@ -217,12 +225,12 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
                   className={cn(s.info, showInfoModal && s.visible)}
                   reset={!showInfoModal || resetScroll}
                 >
-                  {selectedProject.body && (
+                  {selectedProject?.body && (
                     <div className={s.description}>
-                      {renderer(selectedProject.body)}
+                      {renderProjectBody(selectedProject.body)}
                     </div>
                   )}
-                  {selectedProject.testimonial && (
+                  {selectedProject?.testimonial && (
                     <div className={s.testimonial}>
                       <p
                         className={cn(
@@ -275,6 +283,8 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
                   )}
                 </ScrollableBox>
               </div>
+              </>
+              )}
             </section>
           </div>
         </ClientOnly>
@@ -285,156 +295,38 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
   )
 }
 
-export async function getServerSideProps({ preview = false }) {
-  // const [
-  //   // { arteriaStudio }, { footer }, { contact },
-  //   { projects },
-  // ] = await Promise.all([
-  //   // fetchCmsQuery(studioFreightEntryQuery, {
-  //   //   preview,
-  //   // }),
-  //   // fetchCmsQuery(footerEntryQuery, {
-  //   //   preview,
-  //   // }),
-  //   // fetchCmsQuery(contactEntryQuery, {
-  //   //   preview,
-  //   // }),
-  //   fetchCmsQuery(projectListEntryQuery, {
-  //     preview,
-  //   }),
-  // ])
-  const response = await fetchCmsQuery(projectListEntryQuery, {
-    preview,
-  })
-
-  const projectList = []
-  if (response?.list?.itemsCollection?.items) {
-    response.list.itemsCollection.items.forEach((item) => {
-      console.log(response.list.itemsCollection.items)
-      projectList.push({ ...item.json, sys: { id: item.sys.id } })
+export async function getServerSideProps() {
+  try {
+    const dbProjects = await prisma.project.findMany({
+      include: { media: true },
+      orderBy: { createdAt: 'desc' },
     })
-  }
 
-  return {
-    props: {
-      arteriaStudio: {
-        about: {
-          nodeType: 'document',
-          content: [
-            {
-              nodeType: 'paragraph',
-              content: [
-                {
-                  nodeType: 'text',
-                  value: 'Hello',
-                  marks: [{ type: 'bold' }],
-                },
-                {
-                  nodeType: 'text',
-                  value: ' world!',
-                  marks: [{ type: 'italic' }],
-                },
-              ],
-            },
-          ],
-        },
-        email: 'wdqwdwq',
-        phoneNumber: 'dqdqwdq',
-        principles: ['@3', '23', '23', '23'],
-      },
-      footer: {
-        linksCollection: {
-          items: [{ text: 'dwdw', url: 'dwdw' }],
-        },
-      },
-      contact: {
-        form: {
-          portalId: 'dqwdqwdwqdqw',
-          form: {
-            portalId: 'dqwdqwdwqdqw',
-            id: 'dwdw',
-            submitButton: {
-              text: 'dewdeqwdqw',
-            },
-            inputs: [{ name: 'dwdw', type: 'dwdw' }],
+    const items = dbProjects.map((project) => ({
+      ...project,
+      sys: { id: project.id },
+      assetsCollection: {
+        items: project.media.map((media) => ({
+          imagesCollection: {
+            items: [{ url: media.url, title: media.title || project.name }],
           },
-          fields: [{ name: 'dwdw', type: 'dwdw', portalId: 'dqwdqwdwqdqw' }],
-          action: 'dwdw',
-        },
-        description: 'Description',
-        thankYouMessage: 'Thank you',
-        body: 'Body',
-        faqsCollection: {
-          items: [{ title: 'dwdw', body: 'dwdw', content: 'wdwdqdq' }],
-          form: {
-            fields: [{ name: 'dwdw', type: 'dwdw' }],
-            action: 'dwdw',
-            portalId: 'Dqdqwdqw',
-            id: 'dwdw',
-            inputs: [{ name: 'dwdw', type: 'dwdw' }],
-          },
-        },
+        })),
       },
-      projects: {
-        items: projectList.length
-          ? projectList
-          : [
-              {
-                name: 'Path Robotics 4A',
-                industry: 'Manufacturing',
-                link: 'dwdw',
-                sys: {
-                  id: 'wdqdwq',
-                },
-                testimonial: 'okay i got u',
-                assetsCollection: {
-                  items: [
-                    {
-                      imagesCollection: {
-                        items: [
-                          {
-                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
-                          },
-                          {
-                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-                services: ['dwdw'],
-                stack: ['dwdw'],
-                body: 'dwdw',
-              },
-              {
-                name: 'Path Robotics 2A',
-                industry: 'Manufacturing2',
-                link: 'dwdw',
-                sys: {
-                  id: 'dq;ldmqw;ldqw',
-                },
-                assetsCollection: {
-                  items: [
-                    {
-                      imagesCollection: {
-                        items: [
-                          {
-                            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtnvAOajH9gS4C30cRF7rD_voaTAKly2Ntaw&s',
-                          },
-                        ],
-                      },
-                      services: ['dwdw'],
-                      stack: ['dwdw'],
-                      testimonial: 'dwdw',
-                      body: 'dwdw',
-                    },
-                  ],
-                },
-              },
-            ],
+    }))
+
+    return {
+      props: {
+        projects: { items },
+        id: 'home',
       },
-      id: 'home',
-    },
+    }
+  } catch (error) {
+    console.error('Error loading projects from database:', error)
+    return {
+      props: {
+        projects: { items: [] },
+        id: 'home',
+      },
+    }
   }
 }

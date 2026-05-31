@@ -1,6 +1,0 @@
-fragment Image on Asset {
-  __typename
-  title
-  description
-  url
-}

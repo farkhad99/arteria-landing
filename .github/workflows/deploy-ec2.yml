@@ -1,0 +1,46 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, arteria-landing]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write production env from GitHub secrets
+        env:
+          WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID }}
+          NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
+        run: bash scripts/write-production-env.sh .env.production
+
+      - name: Build, migrate, and restart app
+        run: |
+          set -euo pipefail
+          docker build -t arteria-landing:latest .
+          docker rm -f arteria-landing >/dev/null 2>&1 || true
+          docker run --rm --env-file .env.production arteria-landing:latest npx prisma migrate deploy
+          docker run -d --name arteria-landing --restart unless-stopped \
+            --env-file .env.production \
+            -p 3000:3000 arteria-landing:latest
+          sleep 5
+          curl -fsS http://127.0.0.1:3000/ >/dev/null
+          echo "Deploy complete — app is listening on port 3000"
+
+      - name: Remove env file from workspace
+        if: always()
+        run: rm -f .env.production
