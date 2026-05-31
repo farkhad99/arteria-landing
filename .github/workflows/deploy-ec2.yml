@@ -1,13 +1,42 @@
-name: Deploy to EC2
+name: CI and Deploy
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
+  ci:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
   deploy:
-    runs-on: [self-hosted, linux, arteria-landing]
+    name: Deploy to EC2
+    needs: ci
+    if: github.event_name != 'pull_request'
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -58,14 +58,16 @@ Minimum required: `WEBSITE_URL`, `DATABASE_URL`, `ADMIN_PASSWORD`, `ADMIN_SESSIO
 
 ## 4) Trigger deploy
 
-- **Automatic:** push or merge to `main`
-- **Manual:** Actions → **Deploy to EC2** → **Run workflow**
+- **Automatic:** push or merge to `main` (runs **CI and Deploy** pipeline)
+- **Manual:** Actions → **CI and Deploy** → **Run workflow**
 
-The workflow file is `.github/workflows/deploy-ec2.yml` and uses:
+Deploy job uses:
 
 ```yaml
-runs-on: [self-hosted, linux, arteria-landing]
+runs-on: self-hosted
 ```
+
+If deploy stays on **“Waiting for a runner”**, check **Settings → Actions → Runners**: status must be **Idle** (not Offline), and the runner must be registered on **this repository** (not only another org/repo).
 
 ## 5) Verify
 
@@ -84,7 +86,8 @@ Admin: `/admin` (password from `ADMIN_PASSWORD`).
 
 | Issue | Fix |
 |-------|-----|
-| Job queued, never starts | Runner offline — `sudo /home/ubuntu/actions-runner/svc.sh status`, check GitHub runners page |
+| Job queued, never starts | Runner **Offline** or **wrong labels** — use `runs-on: self-hosted` in workflow; `sudo ./svc.sh restart` on EC2 |
+| Waiting for a runner… | Runner offline, wrong repo, or missing label `arteria-landing` — simplify to `runs-on: self-hosted` or add labels on the runner in GitHub |
 | `permission denied` on Docker | `sudo usermod -aG docker ubuntu`, re-login, restart runner service |
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |
@@ -94,6 +97,6 @@ Admin: `/admin` (password from `ADMIN_PASSWORD`).
 
 Terminate TLS on Nginx and proxy to `127.0.0.1:3000`. Do not expose port 3000 publicly if Nginx handles `443`.
 
-## CI on pull requests
+## Pull requests
 
-`ci.yml` still uses GitHub-hosted `ubuntu-latest` for lint/build on PRs. Only **deploy** uses the self-hosted runner.
+PRs run only the **ci** job (lint + build). **deploy** is skipped until merge to `main`.

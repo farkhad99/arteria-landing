@@ -1,6 +1,6 @@
 # Deployment with GitHub Actions
 
-Production deploys use a **self-hosted runner on your AWS EC2** instance. Pushes to `main` run `.github/workflows/deploy-ec2.yml` on that machine.
+Production uses a **single pipeline** in `.github/workflows/deploy-ec2.yml`: lint/build on GitHub-hosted runners, then deploy on your EC2 self-hosted runner (only if CI passes).
 
 Full setup steps: **[github-self-hosted-runner.md](./github-self-hosted-runner.md)**
 
@@ -15,9 +15,11 @@ Full setup steps: **[github-self-hosted-runner.md](./github-self-hosted-runner.m
 
 Individual GitHub secrets (not a single env file). See **[github-secrets.md](./github-secrets.md)** for the full list.
 
-## Workflows
+## Pipeline (`deploy-ec2.yml`)
 
-| File | Runner | When |
-|------|--------|------|
-| `ci.yml` | GitHub-hosted | PRs and pushes (lint + build) |
-| `deploy-ec2.yml` | Self-hosted (`arteria-landing`) | Push to `main`, manual dispatch |
+| Job | Runner | When |
+|-----|--------|------|
+| **ci** — lint + build | `ubuntu-latest` | PRs, push to `main`, manual |
+| **deploy** — Docker + migrate + restart | `self-hosted` (EC2) | After **ci** succeeds on `main` or manual dispatch (skipped on PRs) |
+
+One workflow run per push — not two separate workflows.
