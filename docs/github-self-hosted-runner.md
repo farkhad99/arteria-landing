@@ -90,26 +90,38 @@ Admin: `/admin` (password from `ADMIN_PASSWORD`).
 | Waiting for a runner… | Runner offline, wrong repo, or missing label `arteria-landing` — simplify to `runs-on: self-hosted` or add labels on the runner in GitHub |
 | `docker: command not found` (exit 127) | Install Docker on EC2 and restart the runner (see below) |
 
-### Fix: `docker: command not found`
+### Install Docker manually on EC2
 
-On EC2:
+SSH in, then run **all** of this:
 
 ```bash
 sudo apt update
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
+
+# Allow the runner user to use Docker (default: ubuntu)
 sudo usermod -aG docker ubuntu
 
-# Restart runner so the docker group applies
+# Restart GitHub runner so group membership applies
 cd /home/ubuntu/actions-runner
 sudo ./svc.sh stop
 sudo ./svc.sh start
 
-# Must succeed:
+# Must succeed before re-running Actions:
 sudo -u ubuntu docker ps
+sudo -u ubuntu docker run --rm hello-world
 ```
 
-Then re-run **CI and Deploy** in GitHub Actions.
+If `docker ps` works as `ubuntu` but Actions still fails, reboot EC2 once: `sudo reboot` (then wait and re-run the workflow).
+
+Then in GitHub: **Actions → CI and Deploy → Re-run failed jobs**.
+
+### Verify Docker step fails (exit 1)
+
+| Symptom in log | Fix |
+|----------------|-----|
+| `docker not found` | Run `apt install docker.io` above |
+| `cannot use it` / permission | `usermod -aG docker ubuntu` + **restart runner service** (or reboot) |
 | `permission denied` on Docker | `sudo usermod -aG docker ubuntu`, re-login, restart runner service |
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |

@@ -1,4 +1,4 @@
-import { useOutsideClickEvent } from '@studio-freight/hamo'
+import { useOutsideClickEvent } from '@darkroom.engineering/hamo'
 import cn from 'clsx'
 import { ComposableImage } from 'components/composable-image'
 import { ScrollableBox } from 'components/scrollable-box'

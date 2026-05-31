@@ -14,17 +14,15 @@
     "analyze": "cross-env ANALYZE=true next build",
     "analyze:server": "cross-env BUNDLE_ANALYZE=server next build",
     "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
-    "prepare": "husky install",
-    "size": "npm run build && size-limit"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1045.0",
     "@aws-sdk/s3-request-presigner": "^3.1045.0",
-    "@ducanh2912/next-pwa": "^10.1.0",
+    "@darkroom.engineering/hamo": "^0.6.46",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-accordion": "^1.1.2",
     "@studio-freight/compono": "^0.0.42",
-    "@studio-freight/hamo": "^0.6.24",
     "@studio-freight/react-lenis": "0.0.40",
     "@studio-freight/tempus": "0.0.38",
     "@theatre/core": "^0.7.0",
@@ -36,34 +34,31 @@
     "gsap": "^3.12.4",
     "idb-keyval": "^6.2.1",
     "jsonminify": "^0.4.2",
-    "million": "2.6.4",
     "next": "14.0.4",
     "next-sitemap": "^4.2.3",
     "prisma": "^6.19.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-hook-form": "^7.49.2",
     "react-use": "^17.4.2",
-    "react-use-measure": "^2.1.1",
     "sass": "^1.69.7",
     "throttle-debounce": "5.0.0",
     "zustand": "4.4.7"
   },
   "devDependencies": {
-    "@builder.io/partytown": "^0.8.1",
     "@next/bundle-analyzer": "^14.0.4",
-    "@size-limit/preset-app": "^11.0.1",
     "@svgr/webpack": "^8.1.0",
-    "critters": "^0.0.20",
     "cross-env": "^7.0.3",
     "eslint": "8.56.0",
     "eslint-config-next": "14.0.4",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
-    "prettier": "^3.1.1",
-    "prettier-eslint": "^16.2.0",
-    "size-limit": "^11.0.1"
+    "prettier": "^3.1.1"
+  },
+  "overrides": {
+    "@studio-freight/hamo": "npm:@darkroom.engineering/hamo@^0.6.46",
+    "react-is": "18.2.0",
+    "throttle-debounce": "5.0.0"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
@@ -71,13 +66,9 @@
   },
   "pnpm": {
     "overrides": {
+      "@studio-freight/hamo": "npm:@darkroom.engineering/hamo@^0.6.46",
       "react-is": "18.2.0",
       "throttle-debounce": "5.0.0"
     }
-  },
-  "size-limit": [
-    {
-      "path": ".next/static/chunks/**/*.js"
-    }
-  ]
+  }
 }

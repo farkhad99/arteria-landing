@@ -1,5 +1,5 @@
 import { Cursor, CustomHead, Scrollbar } from '@studio-freight/compono'
-import { useDebug } from '@studio-freight/hamo'
+import { useDebug } from '@darkroom.engineering/hamo'
 import cn from 'clsx'
 import { Footer } from 'components/footer'
 import { Header } from 'components/header'

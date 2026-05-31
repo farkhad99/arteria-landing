@@ -43,10 +43,21 @@ jobs:
 
       - name: Verify Docker
         run: |
+          set -euxo pipefail
           export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          command -v docker
+          if ! command -v docker; then
+            echo "::error::docker not found. On EC2 run: sudo apt install -y docker.io && sudo systemctl start docker"
+            exit 1
+          fi
           docker --version
-          docker info >/dev/null
+          if ! docker ps >/dev/null 2>&1; then
+            echo "::error::docker exists but this user cannot use it (usually missing docker group + runner restart)"
+            echo "On EC2: sudo usermod -aG docker ubuntu && cd /home/ubuntu/actions-runner && sudo ./svc.sh restart"
+            id
+            ls -la /var/run/docker.sock || true
+            exit 1
+          fi
+          echo "Docker is ready"
 
       - name: Write production env from GitHub secrets
         env:

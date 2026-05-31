@@ -1,4 +1,4 @@
-import { useFrame } from '@studio-freight/hamo'
+import { useFrame } from '@darkroom.engineering/hamo'
 import Lenis from '@studio-freight/lenis'
 import cn from 'clsx'
 import { useEffect, useRef, useState } from 'react'

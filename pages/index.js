@@ -1,5 +1,5 @@
 import { Link } from '@studio-freight/compono'
-import { useMediaQuery } from '@studio-freight/hamo'
+import { useMediaQuery } from '@darkroom.engineering/hamo'
 import va from '@vercel/analytics'
 import cn from 'clsx'
 import { ComposableImage } from 'components/composable-image'

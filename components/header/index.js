@@ -1,5 +1,5 @@
 import { Marquee } from '@studio-freight/compono'
-import { useMediaQuery } from '@studio-freight/hamo'
+import { useMediaQuery } from '@darkroom.engineering/hamo'
 import va from '@vercel/analytics'
 import cn from 'clsx'
 import { ContactForm } from 'components/header/contact-form'
