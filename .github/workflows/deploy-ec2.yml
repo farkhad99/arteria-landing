@@ -37,6 +37,20 @@ jobs:
     needs: ci
     if: github.event_name != 'pull_request'
     runs-on: self-hosted
+    env:
+      NODE_ENV: production
+      WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID }}
+      NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,35 +73,58 @@ jobs:
           fi
           echo "Docker is ready"
 
-      - name: Write production env from GitHub secrets
-        env:
-          WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID }}
-          NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
-        run: bash scripts/write-production-env.sh .env.production
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+          required=(
+            WEBSITE_URL DATABASE_URL ADMIN_PASSWORD ADMIN_SESSION_SECRET
+            AWS_REGION AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_S3_BUCKET
+            TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
+          )
+          for key in "${required[@]}"; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Missing GitHub secret: $key"
+              exit 1
+            fi
+          done
+          case "$DATABASE_URL" in
+            postgresql://*|postgres://*) echo "DATABASE_URL format OK" ;;
+            *)
+              echo "::error::DATABASE_URL must start with postgresql:// or postgres://"
+              exit 1
+              ;;
+          esac
 
       - name: Build, migrate, and restart app
         run: |
           set -euo pipefail
+          # Pass runner env into container (-e VAR reads from shell, no file on disk)
+          docker_env=(
+            -e NODE_ENV
+            -e WEBSITE_URL
+            -e DATABASE_URL
+            -e ADMIN_PASSWORD
+            -e ADMIN_SESSION_SECRET
+            -e AWS_REGION
+            -e AWS_ACCESS_KEY_ID
+            -e AWS_SECRET_ACCESS_KEY
+            -e AWS_S3_BUCKET
+            -e TELEGRAM_BOT_TOKEN
+            -e TELEGRAM_CHAT_ID
+          )
+          if [[ -n "${NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID:-}" ]]; then
+            docker_env+=(-e NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+          fi
+          if [[ -n "${NEXT_PUBLIC_GOOGLE_ANALYTICS:-}" ]]; then
+            docker_env+=(-e NEXT_PUBLIC_GOOGLE_ANALYTICS)
+          fi
+
           docker build -t arteria-landing:latest .
           docker rm -f arteria-landing >/dev/null 2>&1 || true
-          docker run --rm --env-file .env.production arteria-landing:latest npx prisma migrate deploy
+          docker run --rm "${docker_env[@]}" arteria-landing:latest npx prisma migrate deploy
           docker run -d --name arteria-landing --restart unless-stopped \
-            --env-file .env.production \
+            "${docker_env[@]}" \
             -p 3000:3000 arteria-landing:latest
           sleep 5
           curl -fsS http://127.0.0.1:3000/ >/dev/null
           echo "Deploy complete — app is listening on port 3000"
-
-      - name: Remove env file from workspace
-        if: always()
-        run: rm -f .env.production

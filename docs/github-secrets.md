@@ -1,6 +1,6 @@
 # GitHub Actions secrets
 
-Production credentials live in **GitHub repository secrets** — not in a committed `.env` file. Each deploy writes a temporary `.env.production`, uses it for Docker, then deletes it.
+Production credentials live in **GitHub repository secrets** — not in a committed `.env` file. The deploy job passes them from the runner environment into Docker with `docker run -e VAR` (no `.env` file on disk).
 
 Add secrets at: **Settings → Secrets and variables → Actions → New repository secret**
 
@@ -9,7 +9,7 @@ Add secrets at: **Settings → Secrets and variables → Actions → New reposit
 | Secret | Used for |
 |--------|----------|
 | `WEBSITE_URL` | Canonical site URL (sitemap), e.g. `https://arteria.world` |
-| `DATABASE_URL` | PostgreSQL for Prisma (projects, contact requests) |
+| `DATABASE_URL` | PostgreSQL for Prisma — value must be **only** the URL, e.g. `postgresql://user:pass@host:5432/postgres?schema=public` (no `DATABASE_URL=` prefix, no quotes) |
 | `ADMIN_PASSWORD` | `/admin` login |
 | `ADMIN_SESSION_SECRET` | Admin session cookie signing (long random string) |
 | `AWS_REGION` | S3 region, e.g. `eu-central-1` |

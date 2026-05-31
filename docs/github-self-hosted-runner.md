@@ -26,29 +26,25 @@ ssh -i your-key.pem ubuntu@<EC2_PUBLIC_IP>
 
 ## 2) Install the runner (one time)
 
-On the EC2 instance:
-
-```bash
-# Copy script from your machine, or clone the repo once:
-git clone https://github.com/farkhad99/arteria-landing.git
-cd arteria-landing
-```
-
-Get a **registration token** (valid ~1 hour):
+Follow GitHub’s UI — no repo script required.
 
 1. Open [Actions → Runners](https://github.com/farkhad99/arteria-landing/settings/actions/runners)
-2. Click **New self-hosted runner**
-3. Choose **Linux** and copy the token from the configure command
+2. **New self-hosted runner** → **Linux** → **x64**
+3. On EC2, run the commands GitHub shows (download, `./config.sh`, `./svc.sh install`)
 
-Run the bootstrap script:
+Typical flow:
 
 ```bash
-sudo GITHUB_RUNNER_TOKEN=<paste-token-here> ./scripts/setup-github-runner.sh
+mkdir -p ~/actions-runner && cd ~/actions-runner
+# curl + tar from GitHub’s runner page (version in UI)
+./config.sh --url https://github.com/farkhad99/arteria-landing --token <TOKEN>
+sudo ./svc.sh install ubuntu
+sudo ./svc.sh start
 ```
 
-Log out and back in (or reboot) so the `ubuntu` user’s `docker` group membership applies.
+Install Docker on the same machine (see [Install Docker manually](#install-docker-manually-on-ec2)), then restart the runner.
 
-Verify in GitHub: the runner should appear as **Idle** with labels `arteria-landing` and `linux`.
+Verify in GitHub: runner status **Idle**, label **self-hosted**.
 
 ## 3) GitHub secrets
 
@@ -125,7 +121,7 @@ Then in GitHub: **Actions → CI and Deploy → Re-run failed jobs**.
 | `permission denied` on Docker | `sudo usermod -aG docker ubuntu`, re-login, restart runner service |
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |
-| Re-register runner | New token from GitHub → run `setup-github-runner.sh` again (`--replace` is set) |
+| Re-register runner | New token from GitHub → `./config.sh` again with `--replace` on EC2 |
 
 ## Optional: Nginx + HTTPS
 
