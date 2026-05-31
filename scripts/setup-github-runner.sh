@@ -68,11 +68,29 @@ sudo -u "${RUNNER_USER}" ./config.sh \
   --unattended \
   --replace
 
+echo "==> Ensuring runner can run docker"
+if ! sudo -u "${RUNNER_USER}" docker ps >/dev/null 2>&1; then
+  echo "Docker not usable by ${RUNNER_USER}. Fixing group membership..."
+  usermod -aG docker "${RUNNER_USER}"
+fi
+
+# Runner service uses a minimal PATH; include standard locations
+RUNNER_ENV="${RUNNER_DIR}/.env"
+touch "${RUNNER_ENV}"
+chown "${RUNNER_USER}:${RUNNER_USER}" "${RUNNER_ENV}"
+if ! grep -q '^PATH=' "${RUNNER_ENV}" 2>/dev/null; then
+  echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' >> "${RUNNER_ENV}"
+fi
+
 echo "==> Installing systemd service"
 ./svc.sh install "${RUNNER_USER}"
+./svc.sh stop || true
 ./svc.sh start
 ./svc.sh status
 
+sudo -u "${RUNNER_USER}" docker ps >/dev/null
+echo "Docker OK for ${RUNNER_USER}"
+
 echo ""
-echo "Runner installed. In GitHub, confirm it shows as Idle with labels: ${RUNNER_LABELS}"
+echo "Runner installed. In GitHub, confirm it shows as Idle."
 echo "Push to main will run: .github/workflows/deploy-ec2.yml"

@@ -88,6 +88,28 @@ Admin: `/admin` (password from `ADMIN_PASSWORD`).
 |-------|-----|
 | Job queued, never starts | Runner **Offline** or **wrong labels** — use `runs-on: self-hosted` in workflow; `sudo ./svc.sh restart` on EC2 |
 | Waiting for a runner… | Runner offline, wrong repo, or missing label `arteria-landing` — simplify to `runs-on: self-hosted` or add labels on the runner in GitHub |
+| `docker: command not found` (exit 127) | Install Docker on EC2 and restart the runner (see below) |
+
+### Fix: `docker: command not found`
+
+On EC2:
+
+```bash
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker ubuntu
+
+# Restart runner so the docker group applies
+cd /home/ubuntu/actions-runner
+sudo ./svc.sh stop
+sudo ./svc.sh start
+
+# Must succeed:
+sudo -u ubuntu docker ps
+```
+
+Then re-run **CI and Deploy** in GitHub Actions.
 | `permission denied` on Docker | `sudo usermod -aG docker ubuntu`, re-login, restart runner service |
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |

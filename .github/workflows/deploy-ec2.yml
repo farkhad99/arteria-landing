@@ -41,6 +41,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify Docker
+        run: |
+          export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          command -v docker
+          docker --version
+          docker info >/dev/null
+
       - name: Write production env from GitHub secrets
         env:
           WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
