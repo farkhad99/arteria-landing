@@ -27,12 +27,12 @@ if (typeof window !== 'undefined') {
 
   window.CREDIT_ME = {
     id: location.hostname,
-    url: 'https://arteria.world',
+    url: 'https://thearteria.com',
     credits: [
       {
-        name: 'Arteria World',
-        email: 'hello@arteria.world',
-        website: 'https://arteria.world',
+        name: 'The Arteria Studio',
+        email: 'hello@thearteria.com',
+        website: 'https://thearteria.com',
       },
     ],
   }

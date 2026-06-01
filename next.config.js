@@ -3,6 +3,18 @@ const path = require('path')
 const s3Bucket = process.env.AWS_S3_BUCKET || 'arteria-uploads'
 const s3Region = process.env.AWS_REGION || 'eu-north-1'
 const s3Hostname = `${s3Bucket}.s3.${s3Region}.amazonaws.com`
+
+const s3ImageHosts = [
+  s3Hostname,
+  'arteria-uploads.s3.eu-north-1.amazonaws.com',
+  'arteria-uploads.s3.eu-central-1.amazonaws.com',
+].filter((host, index, list) => list.indexOf(host) === index)
+
+const s3RemotePatterns = s3ImageHosts.map((hostname) => ({
+  protocol: 'https',
+  hostname,
+  pathname: '/**',
+}))
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({
 //   enabled: process.env.ANALYZE === 'true',
 // })
@@ -17,27 +29,30 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV !== 'development',
   },
   images: {
+    // Legacy allowlist — still respected by next/image in Next 14
+    domains: s3ImageHosts,
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'assets.studiofreight.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'www.google.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com',
+        pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: s3Hostname,
-        pathname: '/projects/**',
-      },
+      ...s3RemotePatterns,
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [256, 384, 512, 640, 750, 828],
   },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],

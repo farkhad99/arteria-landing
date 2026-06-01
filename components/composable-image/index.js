@@ -1,7 +1,7 @@
-import { Image } from '@studio-freight/compono'
 import cn from 'clsx'
 import { OptimizedVideo } from 'components/optimized-video'
 import { isVideoUrl } from 'lib/media-url'
+import NextImage from 'next/image'
 import s from './composable-image.module.scss'
 
 /** Project panel thumbnails — keep srcset widths small */
@@ -31,7 +31,7 @@ export function ComposableImage({
     <div className={s.images}>
       {sources.items.map((source) => {
         const url = source.url
-        const itemWidth = width / amount
+        const itemWidth = Math.round(width / amount)
         const className = cn(s.image, large && s.large, small && s.small)
         const style = { '--height': height, '--width': itemWidth }
 
@@ -46,7 +46,7 @@ export function ComposableImage({
         }
 
         return (
-          <Image
+          <NextImage
             key={url}
             src={url}
             alt={source.title || ''}
