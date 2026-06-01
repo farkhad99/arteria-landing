@@ -1,18 +1,17 @@
 import cn from 'clsx'
 import s from './site-title.module.scss'
 
-const TITLE = 'Arteria Studios'
+const LABEL = 'ARTERIA STUDIOS'
 
 export function SiteTitle({ className }) {
   return (
-    <h1 className={cn(s.root, 'h1', className)} aria-label={TITLE}>
-      <span className={s.inner} aria-hidden="true">
-        {[...TITLE].map((char, i) => (
-          <span key={i} className={s.char}>
-            {char === ' ' ? '\u00A0' : char}
-          </span>
-        ))}
-      </span>
+    <h1 className={cn(s.root, 'h1', className)} aria-label="Arteria Studios">
+      <div className={s.viewport} aria-hidden="true">
+        <div className={s.track}>
+          <span className={s.slide}>{LABEL}</span>
+          <span className={s.slide}>{LABEL}</span>
+        </div>
+      </div>
     </h1>
   )
 }
