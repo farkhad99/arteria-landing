@@ -100,10 +100,6 @@
       @include mobile {
         margin: mobile-vw(10px) 0;
       }
-
-      @include desktop {
-        max-height: desktop-vw(138px);
-      }
     }
   }
 }

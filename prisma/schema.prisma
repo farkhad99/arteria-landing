@@ -34,15 +34,17 @@ model Project {
 }
 
 model ProjectMedia {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   projectId   String
   kind        MediaKind
   title       String?
   url         String
   s3Key       String
   contentType String?
-  createdAt   DateTime @default(now())
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sortOrder   Int             @default(0)
+  columnSpan  MediaColumnSpan @default(TWO_COLUMNS)
+  createdAt   DateTime        @default(now())
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 enum MediaLayout {
@@ -53,4 +55,9 @@ enum MediaLayout {
 enum MediaKind {
   IMAGE
   VIDEO
+}
+
+enum MediaColumnSpan {
+  ONE_COLUMN
+  TWO_COLUMNS
 }

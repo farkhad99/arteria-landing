@@ -118,7 +118,6 @@ export function Layout({
   theme = 'dark',
   className,
   principles,
-  footerLinks,
   studioInfo,
   contactData,
 }) {
@@ -133,7 +132,7 @@ export function Layout({
         <Scrollbar />
         <Header principles={principles} contact={contactData} />
         <main className={s.main}>{children}</main>
-        <Footer links={footerLinks || []} studioInfo={studioInfo} />
+        <Footer studioInfo={studioInfo} />
       </div>
 
       {debug && (

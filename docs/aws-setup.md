@@ -15,6 +15,8 @@ This repository includes a direct EC2 deployment workflow for fastest setup, whi
 
 Add a bucket policy for read access only if you need public direct URLs from the app. Prefer CloudFront signed delivery for stricter control in production.
 
+Admin media uploads go through `/api/admin/upload` on your Next.js server (server-side `PutObject` to S3). You do **not** need S3 CORS rules for browser uploads.
+
 ## 2) Create RDS PostgreSQL
 1. Open AWS Console -> RDS -> Create database.
 2. Engine: PostgreSQL.

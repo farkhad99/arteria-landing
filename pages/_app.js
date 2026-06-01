@@ -7,16 +7,8 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useStore } from 'lib/store'
 // import { ProjectProvider, RafDriverProvider } from 'lib/theatre'
-import dynamic from 'next/dynamic'
 import { useEffect } from 'react'
 import 'styles/global.scss'
-
-const Noise = dynamic(
-  () => import('components/noise').then(({ Noise }) => Noise),
-  {
-    ssr: false,
-  },
-)
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -65,7 +57,6 @@ function MyApp({ Component, pageProps }) {
     <>
       {/* <PageTransition /> */}
       <RealViewport />
-      <Noise />
       {/* <ProjectProvider
         id="Satus"
         config="/config/Satus-2023-04-17T12_55_21.json"

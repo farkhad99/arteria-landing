@@ -1,0 +1,15 @@
+.root {
+  width: 100%;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.char {
+  flex: 0 0 auto;
+}

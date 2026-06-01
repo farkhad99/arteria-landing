@@ -5,7 +5,12 @@ import cn from 'clsx'
 import { Separator } from 'components/separator'
 import s from './footer.module.scss'
 
-export function Footer({ className, style, links }) {
+const X_LINK = {
+  url: 'https://x.com/denkegut',
+  text: '@denkegut',
+}
+
+export function Footer({ className, style }) {
   const isMobile = useMediaQuery('(max-width: 800px)')
   const footerPhone = '+998996924479'
   const footerEmail = 'segeayupov@gmail.com'
@@ -22,65 +27,14 @@ export function Footer({ className, style, links }) {
         >
           Capabilities Deck ↓
         </a>
-        {isMobile === false && (
-          <>
-            <ul className={s.column}>
-              {links.slice(0, 2).map((link, i) => (
-                <li key={i}>
-                  <Link className="p-s decorate" href={link.url}>
-                    {link.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <ul className={s.column}>
-              {links.slice(2, 4).map((link, i) => (
-                <li key={i}>
-                  <Link className="p-s decorate" href={link.url}>
-                    {link.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <ul className={s.column}>
-              {links.slice(4, 6).map((link, i) => (
-                <li key={i}>
-                  <Link className="p-s decorate" href={link.url}>
-                    {link.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
 
-        {isMobile === true && (
-          <>
-            <ul className={s.column}>
-              <li className="p-s text-muted">
-                &copy; {new Date().getFullYear()}
-              </li>
-            </ul>
-            <ul className={s.column}>
-              {links.slice(0, 3).map((link, i) => (
-                <li key={i}>
-                  <Link className="p-s decorate" href={link.url}>
-                    {link.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <ul className={s.column}>
-              {links.slice(3, 6).map((link, i) => (
-                <li key={i}>
-                  <Link className="p-s decorate" href={link.url}>
-                    {link.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        <ul className={s.column}>
+          <li>
+            <Link className="p-s decorate" href={X_LINK.url}>
+              {X_LINK.text}
+            </Link>
+          </li>
+        </ul>
 
         <ul className={s.column}>
           <li>
@@ -102,13 +56,21 @@ export function Footer({ className, style, links }) {
             </li>
           </ul>
         )}
+
+        {isMobile === true && (
+          <ul className={s.column}>
+            <li className="p-s text-muted">
+              &copy; {new Date().getFullYear()}
+            </li>
+          </ul>
+        )}
       </div>
 
       {isMobile === true && (
         <section className={s['footer-image']}>
           <Image
             src="/mobile-temp-images/footer.png"
-            alt="studio freight"
+            alt="Arteria Studios"
             fill
             className={s.image}
           />

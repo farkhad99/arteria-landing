@@ -67,7 +67,6 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
         email: arteriaStudio?.email,
       }}
       contactData={contact}
-      footerLinks={footer?.linksCollection.items}
     >
       {!isDesktop ? (
         <LayoutMobile studioFreight={arteriaStudio} projects={projects} />
@@ -198,10 +197,16 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
                     Enlarge
                   </button>
                   <ScrollableBox reset={showInfoModal || resetScroll}>
+                    <div className={s.assetsGrid}>
                     {selectedProject?.assetsCollection?.items.map(
                       (asset, i) => (
                         <button
-                          className={s.assetButton}
+                          className={cn(
+                            s.assetButton,
+                            asset.columnSpan === 'ONE_COLUMN'
+                              ? s.assetOneCol
+                              : s.assetTwoCol,
+                          )}
                           key={i}
                           onClick={() => {
                             va.track('Opened Gallery:', {
@@ -219,6 +224,7 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
                         </button>
                       ),
                     )}
+                    </div>
                   </ScrollableBox>
                 </div>
                 <ScrollableBox
@@ -298,7 +304,7 @@ export default function Home({ arteriaStudio, footer, contact, projects }) {
 export async function getServerSideProps() {
   try {
     const dbProjects = await prisma.project.findMany({
-      include: { media: true },
+      include: { media: { orderBy: { sortOrder: 'asc' } } },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -307,6 +313,7 @@ export async function getServerSideProps() {
       sys: { id: project.id },
       assetsCollection: {
         items: project.media.map((media) => ({
+          columnSpan: media.columnSpan,
           imagesCollection: {
             items: [{ url: media.url, title: media.title || project.name }],
           },

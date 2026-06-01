@@ -134,9 +134,24 @@
         }
       }
 
+      .assetsGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: desktop-vw(12px);
+        width: 100%;
+      }
+
       .assetButton {
         display: block;
         width: 100%;
+      }
+
+      .assetOneCol {
+        grid-column: span 1;
+      }
+
+      .assetTwoCol {
+        grid-column: span 2;
       }
 
       &:not(.visible) {
