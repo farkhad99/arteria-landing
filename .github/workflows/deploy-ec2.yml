@@ -122,7 +122,7 @@ jobs:
             docker_env+=(-e NEXT_PUBLIC_GOOGLE_ANALYTICS)
           fi
 
-          docker build \
+          docker build --no-cache \
             --build-arg AWS_S3_BUCKET="$AWS_S3_BUCKET" \
             --build-arg AWS_REGION="$AWS_REGION" \
             -t arteria-landing:latest .
@@ -133,4 +133,16 @@ jobs:
             -p 3000:3000 arteria-landing:latest
           sleep 5
           curl -fsS http://127.0.0.1:3000/ >/dev/null
+
+          # Public project images must load (direct S3 or /_next/image)
+          sample_url="https://${AWS_S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/projects/smoke-test.jpg"
+          encoded_url="$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$sample_url''', safe=''))")"
+          img_code="$(curl -s -o /dev/null -w '%{http_code}' \
+            "http://127.0.0.1:3000/_next/image?url=${encoded_url}&w=640&q=75" || echo 000)"
+          if [[ "$img_code" == "200" ]]; then
+            echo "Image optimizer allowlist OK (/_next/image → 200)"
+          else
+            echo "::warning::/_next/image returned HTTP $img_code for S3 URL (site uses direct S3 img when unoptimized)"
+          fi
+
           echo "Deploy complete — app is listening on port 3000"

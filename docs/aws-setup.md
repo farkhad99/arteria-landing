@@ -93,6 +93,10 @@ This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was *
    `https://your-domain/_next/image?url=https%3A%2F%2Farteria-uploads.s3.eu-north-1.amazonaws.com%2Fprojects%2F<one-file>.jpg&w=640&q=75`  
    You should get an image (200), not JSON with `"url" parameter is not allowed`.
 4. `npm run build` locally runs `scripts/verify-image-config.js` and fails if S3 hosts are missing from the baked allowlist.
+
+**Current default:** project images on S3 use **`unoptimized`** (browser loads the public S3 URL directly), so they work even if production is still on an old Docker image that rejects `/_next/image`. After a successful deploy with an updated allowlist, you can set GitHub secret / env `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` to re-enable WebP/AVIF via `/_next/image`.
+
+Compare build IDs: local `cat .next/BUILD_ID` vs view page source on production (`buildId` in `__NEXT_DATA__`). If they differ, production has not picked up the latest deploy.
 - **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14).
 - **Legacy non-S3 images** (e.g. Contentful): still use `/_next/image` optimization where configured.
 
