@@ -1,6 +1,10 @@
+import { MediaDropzone } from 'components/admin/media-dropzone'
+import { ProjectDrawer } from 'components/admin/project-drawer'
 import { clearSessionCookie, isAdminAuthenticated } from 'lib/admin-auth'
+import { parseApiResponse } from 'lib/parse-api-response'
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from 'lib/upload-limits'
 import cn from 'clsx'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import s from './admin.module.scss'
 
 const emptyForm = {
@@ -53,22 +57,24 @@ export default function AdminPage({ authenticated }) {
   const [isAuthenticated, setIsAuthenticated] = useState(authenticated)
   const [password, setPassword] = useState('')
   const [form, setForm] = useState(emptyForm)
-  const [mediaFile, setMediaFile] = useState(null)
   const [mediaItems, setMediaItems] = useState([])
   const [status, setStatus] = useState('')
   const [contacts, setContacts] = useState([])
   const [projects, setProjects] = useState([])
   const [editingId, setEditingId] = useState(null)
+  const [activeTab, setActiveTab] = useState('projects')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const canSubmit = useMemo(() => form.name.trim().length > 0, [form.name])
   const isEditing = Boolean(editingId)
 
-  const resetProjectForm = () => {
+  const resetProjectForm = useCallback(() => {
     setForm(emptyForm)
-    setMediaFile(null)
     setMediaItems([])
     setEditingId(null)
-  }
+    setDrawerOpen(false)
+    setStatus('')
+  }, [])
 
   const login = async (event) => {
     event.preventDefault()
@@ -96,7 +102,7 @@ export default function AdminPage({ authenticated }) {
 
   const fetchContacts = async () => {
     const response = await fetch('/api/contact/requests')
-    const payload = await response.json()
+    const { data: payload } = await parseApiResponse(response)
     if (response.ok) {
       setContacts(payload.items)
     }
@@ -104,7 +110,7 @@ export default function AdminPage({ authenticated }) {
 
   const fetchProjects = async () => {
     const response = await fetch('/api/projects')
-    const payload = await response.json()
+    const { data: payload } = await parseApiResponse(response)
     if (response.ok) {
       setProjects(payload.items)
     }
@@ -116,50 +122,49 @@ export default function AdminPage({ authenticated }) {
     fetchProjects()
   }, [isAuthenticated])
 
-  const uploadMedia = async () => {
-    if (!mediaFile) {
-      return null
+  const uploadFile = useCallback(async (file) => {
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error(`File exceeds ${MAX_UPLOAD_LABEL} limit`)
     }
 
     const uploadResponse = await fetch('/api/admin/upload', {
       method: 'POST',
       headers: {
-        'Content-Type': mediaFile.type,
-        'X-Filename': mediaFile.name,
+        'Content-Type': file.type,
+        'X-Filename': file.name,
       },
-      body: mediaFile,
+      body: file,
     })
 
-    const payload = await uploadResponse.json()
+    const { data: payload } = await parseApiResponse(uploadResponse)
     if (!uploadResponse.ok) {
       throw new Error(payload.error || 'Failed to upload file')
     }
 
     return {
       kind: payload.kind,
-      title: mediaFile.name,
+      title: file.name,
       url: payload.fileUrl,
       s3Key: payload.key,
       contentType: payload.contentType,
       columnSpan: 'two_columns',
     }
+  }, [])
+
+  const openCreateDrawer = () => {
+    setEditingId(null)
+    setForm(emptyForm)
+    setMediaItems([])
+    setStatus('')
+    setDrawerOpen(true)
   }
 
-  const addMediaToList = async () => {
-    if (!mediaFile) {
-      setStatus('Choose a file to upload first.')
-      return
-    }
-
-    setStatus('Uploading media...')
-    try {
-      const uploaded = await uploadMedia()
-      setMediaItems((prev) => normalizeMediaItems([...prev, uploaded]))
-      setMediaFile(null)
-      setStatus('Media added to project.')
-    } catch (error) {
-      setStatus(error.message)
-    }
+  const startEdit = (project) => {
+    setEditingId(project.id)
+    setForm(projectToForm(project))
+    setMediaItems(projectToMediaItems(project))
+    setStatus('')
+    setDrawerOpen(true)
   }
 
   const submitProject = async (event) => {
@@ -180,7 +185,7 @@ export default function AdminPage({ authenticated }) {
           body: JSON.stringify(payload),
         },
       )
-      const data = await response.json()
+      const { data } = await parseApiResponse(response)
       if (!response.ok) {
         throw new Error(data.error || 'Failed to save project')
       }
@@ -188,19 +193,9 @@ export default function AdminPage({ authenticated }) {
       setStatus(isEditing ? 'Project updated.' : 'Project created.')
       resetProjectForm()
       fetchProjects()
-      fetchContacts()
     } catch (error) {
       setStatus(error.message)
     }
-  }
-
-  const startEdit = (project) => {
-    setEditingId(project.id)
-    setForm(projectToForm(project))
-    setMediaItems(projectToMediaItems(project))
-    setMediaFile(null)
-    setStatus('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const deleteProject = async (projectId) => {
@@ -212,7 +207,7 @@ export default function AdminPage({ authenticated }) {
     const response = await fetch(`/api/projects/${projectId}`, {
       method: 'DELETE',
     })
-    const payload = await response.json()
+    const { data: payload } = await parseApiResponse(response)
     if (!response.ok) {
       setStatus(payload.error || 'Failed to delete project')
       return
@@ -268,85 +263,149 @@ export default function AdminPage({ authenticated }) {
   return (
     <main className={s.page}>
       <div className={s.container}>
-        <h1 className={s.title}>Arteria Admin</h1>
-        <div className={s.actions}>
-          <button className={s.button} onClick={fetchContacts} type="button">
-            Refresh contact requests
-          </button>
-          <button className={s.button} onClick={fetchProjects} type="button">
-            Refresh projects
-          </button>
-          <button className={s.button} onClick={logout} type="button">
-            Logout
-          </button>
-        </div>
-
-        <section className={s.card}>
-          <h2>Projects ({projects.length})</h2>
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Industry</th>
-                  <th>Media</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projects.length === 0 && (
-                  <tr>
-                    <td className={s.muted} colSpan={5}>
-                      No projects yet.
-                    </td>
-                  </tr>
-                )}
-                {projects.map((project) => (
-                  <tr key={project.id}>
-                    <td>{project.name}</td>
-                    <td>{project.industry || '-'}</td>
-                    <td>{project.media?.length || 0}</td>
-                    <td>{new Date(project.updatedAt).toLocaleString()}</td>
-                    <td>
-                      <div className={s.rowActions}>
-                        <button
-                          className={s.button}
-                          type="button"
-                          onClick={() => startEdit(project)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={cn(s.button, s.danger)}
-                          type="button"
-                          onClick={() => deleteProject(project.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <header className={s.topBar}>
+          <h1 className={s.title}>Arteria Admin</h1>
+          <div className={s.actions}>
+            <button
+              className={s.button}
+              type="button"
+              onClick={() => {
+                if (activeTab === 'projects') fetchProjects()
+                else fetchContacts()
+              }}
+            >
+              Refresh
+            </button>
+            <button className={s.button} type="button" onClick={logout}>
+              Logout
+            </button>
           </div>
-        </section>
+        </header>
 
-        <form className={s.card} onSubmit={submitProject}>
-          <h2>{isEditing ? 'Edit project' : 'Create project'}</h2>
-          {isEditing && (
-            <p className={s.muted}>
-              Editing project ID: {editingId}.{' '}
-              <button
-                className={s.linkButton}
-                type="button"
-                onClick={resetProjectForm}
-              >
-                Cancel edit
+        <nav className={s.tabs} aria-label="Admin sections">
+          <button
+            type="button"
+            className={cn(s.tab, activeTab === 'projects' && s.tabActive)}
+            onClick={() => setActiveTab('projects')}
+          >
+            Projects ({projects.length})
+          </button>
+          <button
+            type="button"
+            className={cn(s.tab, activeTab === 'contacts' && s.tabActive)}
+            onClick={() => setActiveTab('contacts')}
+          >
+            Contacts ({contacts.length})
+          </button>
+        </nav>
+
+        {status && !drawerOpen && <p className={s.statusBanner}>{status}</p>}
+
+        {activeTab === 'projects' && (
+          <section className={s.card}>
+            <div className={s.sectionHead}>
+              <h2>Projects</h2>
+              <button className={cn(s.button, s.buttonAccent)} type="button" onClick={openCreateDrawer}>
+                Add project
               </button>
-            </p>
-          )}
+            </div>
+            <div className={s.tableWrap}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Industry</th>
+                    <th>Media</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {projects.length === 0 && (
+                    <tr>
+                      <td className={s.muted} colSpan={5}>
+                        No projects yet. Click Add project.
+                      </td>
+                    </tr>
+                  )}
+                  {projects.map((project) => (
+                    <tr key={project.id}>
+                      <td>{project.name}</td>
+                      <td>{project.industry || '-'}</td>
+                      <td>{project.media?.length || 0}</td>
+                      <td>{new Date(project.updatedAt).toLocaleString()}</td>
+                      <td>
+                        <div className={s.rowActions}>
+                          <button
+                            className={s.button}
+                            type="button"
+                            onClick={() => startEdit(project)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className={cn(s.button, s.danger)}
+                            type="button"
+                            onClick={() => deleteProject(project.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'contacts' && (
+          <section className={s.card}>
+            <h2>Contact requests</h2>
+            <div className={s.tableWrap}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Company</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contacts.length === 0 && (
+                    <tr>
+                      <td className={s.muted} colSpan={6}>
+                        No contact requests yet.
+                      </td>
+                    </tr>
+                  )}
+                  {contacts.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.name}</td>
+                      <td>{item.email}</td>
+                      <td>{item.company || '-'}</td>
+                      <td>{item.phone || '-'}</td>
+                      <td>{item.message}</td>
+                      <td>{new Date(item.createdAt).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+      </div>
+
+      <ProjectDrawer
+        open={drawerOpen}
+        title={isEditing ? 'Edit project' : 'New project'}
+        onClose={resetProjectForm}
+      >
+        <form className={s.drawerForm} onSubmit={submitProject}>
           <div className={s.grid}>
             <div className={s.field}>
               <label>Name</label>
@@ -398,7 +457,7 @@ export default function AdminPage({ authenticated }) {
                 }
               />
             </div>
-            <div className={s.field}>
+            <div className={`${s.field} ${s.full}`}>
               <label>Project URL</label>
               <input
                 className={s.input}
@@ -419,145 +478,30 @@ export default function AdminPage({ authenticated }) {
               />
             </div>
             <div className={`${s.field} ${s.full}`}>
-              <label>Add media (image/video)</label>
-              <input
-                className={s.input}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,video/mp4"
-                onChange={(event) => setMediaFile(event.target.files?.[0] || null)}
+              <label>Media</label>
+              <MediaDropzone
+                items={mediaItems}
+                onItemsChange={setMediaItems}
+                onUploadFile={uploadFile}
+                onStatus={setStatus}
+                moveItem={moveItem}
+                updateMediaItem={updateMediaItem}
+                removeMediaItem={removeMediaItem}
               />
             </div>
           </div>
 
-          <div className={s.actions}>
-            <button
-              className={s.button}
-              type="button"
-              onClick={addMediaToList}
-              disabled={!mediaFile}
-            >
-              Upload &amp; add to list
-            </button>
-          </div>
-
-          {mediaItems.length > 0 && (
-            <div className={s.mediaList}>
-              <h3>Project media (order &amp; column width)</h3>
-              {mediaItems.map((item, index) => (
-                <div className={s.mediaRow} key={item.id || `${item.url}-${index}`}>
-                  <div className={s.mediaPreview}>
-                    {item.kind === 'video' ? (
-                      <span className={s.muted}>Video: {item.title}</span>
-                    ) : (
-                      <img src={item.url} alt={item.title || 'Project media'} />
-                    )}
-                  </div>
-                  <div className={s.mediaControls}>
-                    <p className={s.muted}>
-                      #{index + 1} · {item.title || 'Untitled'}
-                    </p>
-                    <label>
-                      Width in row
-                      <select
-                        className={s.select}
-                        value={item.columnSpan}
-                        onChange={(event) =>
-                          updateMediaItem(index, { columnSpan: event.target.value })
-                        }
-                      >
-                        <option value="one_column">1 column</option>
-                        <option value="two_columns">2 columns (full row)</option>
-                      </select>
-                    </label>
-                    <div className={s.rowActions}>
-                      <button
-                        className={s.button}
-                        type="button"
-                        disabled={index === 0}
-                        onClick={() =>
-                          setMediaItems((prev) => moveItem(prev, index, index - 1))
-                        }
-                      >
-                        Move up
-                      </button>
-                      <button
-                        className={s.button}
-                        type="button"
-                        disabled={index === mediaItems.length - 1}
-                        onClick={() =>
-                          setMediaItems((prev) => moveItem(prev, index, index + 1))
-                        }
-                      >
-                        Move down
-                      </button>
-                      <button
-                        className={cn(s.button, s.danger)}
-                        type="button"
-                        onClick={() => removeMediaItem(index)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className={s.actions}>
+          <div className={s.drawerActions}>
             <button className={s.button} type="submit" disabled={!canSubmit}>
               {isEditing ? 'Save changes' : 'Create project'}
             </button>
-            {isEditing && (
-              <button
-                className={s.button}
-                type="button"
-                onClick={resetProjectForm}
-              >
-                Cancel
-              </button>
-            )}
+            <button className={s.button} type="button" onClick={resetProjectForm}>
+              Cancel
+            </button>
           </div>
           {status && <p className={s.status}>{status}</p>}
         </form>
-
-        <section className={s.card}>
-          <h2>Contact Form Requests</h2>
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Company</th>
-                  <th>Phone</th>
-                  <th>Message</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {contacts.length === 0 && (
-                  <tr>
-                    <td className={s.muted} colSpan={6}>
-                      No requests loaded yet. Use refresh.
-                    </td>
-                  </tr>
-                )}
-                {contacts.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.name}</td>
-                    <td>{item.email}</td>
-                    <td>{item.company || '-'}</td>
-                    <td>{item.phone || '-'}</td>
-                    <td>{item.message}</td>
-                    <td>{new Date(item.createdAt).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+      </ProjectDrawer>
     </main>
   )
 }

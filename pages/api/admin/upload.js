@@ -1,5 +1,6 @@
 import { isAdminAuthenticated } from 'lib/admin-auth'
 import { createUploadKey, uploadObject } from 'lib/aws-s3'
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from 'lib/upload-limits'
 
 export const config = {
   api: {
@@ -37,6 +38,12 @@ export default async function handler(req, res) {
     const body = await readRequestBody(req)
     if (!body.length) {
       return res.status(400).json({ error: 'Empty upload body' })
+    }
+
+    if (body.length > MAX_UPLOAD_BYTES) {
+      return res.status(413).json({
+        error: `File exceeds maximum size of ${MAX_UPLOAD_LABEL}`,
+      })
     }
 
     const key = createUploadKey({ filename: String(filename) })

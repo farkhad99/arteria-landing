@@ -12,6 +12,10 @@ flowchart LR
   docker --> app[arteria-landing :3000]
 ```
 
+## Admin uploads (413 errors)
+
+If media upload fails with **413**, Nginx in front of the app is likely limiting body size. See [nginx-upload-limit.md](./nginx-upload-limit.md) (`client_max_body_size 50M;`).
+
 ## 1) EC2 prerequisites
 
 - Ubuntu 22.04 or 24.04
