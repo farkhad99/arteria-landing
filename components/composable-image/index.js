@@ -1,6 +1,7 @@
 import cn from 'clsx'
 import { OptimizedVideo } from 'components/optimized-video'
-import { isS3MediaUrl, isVideoUrl } from 'lib/media-url'
+import { shouldUnoptimizeImage } from 'lib/s3-image-settings'
+import { isVideoUrl } from 'lib/media-url'
 import NextImage from 'next/image'
 import s from './composable-image.module.scss'
 
@@ -45,12 +46,6 @@ export function ComposableImage({
           )
         }
 
-        // S3: load directly from the bucket. Production was still serving an old
-        // build where /_next/image rejected S3 hostnames (400 "url not allowed").
-        // Set NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true after deploy verifies /_next/image.
-        const useImageOptimizer =
-          process.env.NEXT_PUBLIC_S3_IMAGE_OPTIMIZER === 'true'
-
         return (
           <NextImage
             key={url}
@@ -63,7 +58,7 @@ export function ComposableImage({
             priority={priority}
             quality={imageQuality}
             sizes={imageSizes}
-            unoptimized={isS3MediaUrl(url) && !useImageOptimizer}
+            unoptimized={shouldUnoptimizeImage(url)}
           />
         )
       })}

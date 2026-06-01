@@ -97,7 +97,8 @@ This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was *
 **Current default:** project images on S3 use **`unoptimized`** (browser loads the public S3 URL directly), so they work even if production is still on an old Docker image that rejects `/_next/image`. After a successful deploy with an updated allowlist, you can set GitHub secret / env `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` to re-enable WebP/AVIF via `/_next/image`.
 
 Compare build IDs: local `cat .next/BUILD_ID` vs view page source on production (`buildId` in `__NEXT_DATA__`). If they differ, production has not picked up the latest deploy.
-- **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14).
+- **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14). Compress MP4/WebM before upload for best performance; optional poster images are not generated automatically yet.
+- **GIFs:** uploaded as `image/gif` and shown with **next/image** (same as JPEG/PNG). They are **not** treated as video. Animated GIFs must stay **unoptimized** (Next.js would strip animation if resized to WebP/AVIF).
 - **Legacy non-S3 images** (e.g. Contentful): still use `/_next/image` optimization where configured.
 
 ## 2) Create RDS PostgreSQL

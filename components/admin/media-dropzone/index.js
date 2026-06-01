@@ -1,4 +1,5 @@
 import cn from 'clsx'
+import { MediaPreviewImage } from 'components/admin/media-preview-image'
 import { OptimizedVideo } from 'components/optimized-video'
 import { isVideoUrl } from 'lib/media-url'
 import { MAX_UPLOAD_LABEL } from 'lib/upload-limits'
@@ -63,7 +64,10 @@ export function MediaDropzone({
 
   return (
     <div className={s.root}>
-      <p className={s.hint}>Images, GIF, or MP4 · max {MAX_UPLOAD_LABEL} each</p>
+      <p className={s.hint}>
+        JPEG, PNG, WebP, GIF (image), or MP4/WebM (video) · max {MAX_UPLOAD_LABEL}{' '}
+        each
+      </p>
       <div
         className={cn(s.grid, isDragging && s.dragging)}
         onDragEnter={(e) => {
@@ -86,7 +90,10 @@ export function MediaDropzone({
               {item.kind === 'video' || isVideoUrl(item.url) ? (
                 <OptimizedVideo src={item.url} className={s.videoPreview} />
               ) : (
-                <img src={item.url} alt={item.title || 'Media'} />
+                <MediaPreviewImage
+                  src={item.url}
+                  alt={item.title || 'Media'}
+                />
               )}
             </div>
             <div className={s.cardBody}>
