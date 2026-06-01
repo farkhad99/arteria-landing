@@ -1,4 +1,8 @@
 const path = require('path')
+
+const s3Bucket = process.env.AWS_S3_BUCKET || 'arteria-uploads'
+const s3Region = process.env.AWS_REGION || 'eu-north-1'
+const s3Hostname = `${s3Bucket}.s3.${s3Region}.amazonaws.com`
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({
 //   enabled: process.env.ANALYZE === 'true',
 // })
@@ -28,17 +32,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**.amazonaws.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.s3.*.amazonaws.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'arteria-uploads.s3.eu-north-1.amazonaws.com',
+        hostname: s3Hostname,
         pathname: '/projects/**',
       },
     ],

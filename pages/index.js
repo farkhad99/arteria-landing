@@ -2,7 +2,10 @@ import { Link } from '@studio-freight/compono'
 import { useMediaQuery } from '@darkroom.engineering/hamo'
 import va from '@vercel/analytics'
 import cn from 'clsx'
-import { ComposableImage } from 'components/composable-image'
+import {
+  ComposableImage,
+  PROJECT_CARD_SIZES,
+} from 'components/composable-image'
 import { ClientOnly } from 'components/isomorphic'
 import { LayoutMobile } from 'components/layout-mobile'
 import { ScrollableBox } from 'components/scrollable-box'
@@ -220,6 +223,11 @@ export default function Home({ arteriaStudio, contact, projects }) {
                             priority={i === 0}
                             width={1026}
                             height={604}
+                            sizes={
+                              asset.columnSpan === 'ONE_COLUMN'
+                                ? PROJECT_CARD_SIZES.oneColumn
+                                : PROJECT_CARD_SIZES.twoColumns
+                            }
                           />
                         </button>
                       ),

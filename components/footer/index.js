@@ -5,11 +5,6 @@ import cn from 'clsx'
 import { Separator } from 'components/separator'
 import s from './footer.module.scss'
 
-const X_LINK = {
-  url: 'https://x.com/denkegut',
-  text: '@denkegut',
-}
-
 export function Footer({ className, style }) {
   const isMobile = useMediaQuery('(max-width: 800px)')
   const footerPhone = '+998996924479'
@@ -27,14 +22,6 @@ export function Footer({ className, style }) {
         >
           Capabilities Deck ↓
         </a>
-
-        <ul className={s.column}>
-          <li>
-            <Link className="p-s decorate" href={X_LINK.url}>
-              {X_LINK.text}
-            </Link>
-          </li>
-        </ul>
 
         <ul className={s.column}>
           <li>

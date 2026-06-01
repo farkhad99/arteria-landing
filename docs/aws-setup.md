@@ -15,11 +15,12 @@ This repository includes a direct EC2 deployment workflow for fastest setup, whi
 
 **Public read for project files (required):** your app user (`arteria-dev`) can upload, but **visitors and Next.js Image** are anonymous. Without a public `GetObject` rule on `projects/*`, images return 403/400 on the site and in admin previews.
 
-**Block Public Access:** edit bucket → Permissions → Block Public Access → uncheck only:
+**Block Public Access:** edit bucket → Permissions → Block Public Access. For a public read policy on `projects/*` to work, **uncheck these two** (leave the ACL-related two **checked**):
 
-- *Block public access to buckets and objects granted through **new public bucket policies***
+1. *Block public access … granted through **new** public bucket or access point policies*
+2. *Block public and cross-account access … through **any** public bucket or access point policies*
 
-Leave the other three Block Public Access settings **on**.
+If the second one stays **on**, your `Principal: "*"` `GetObject` rule has no effect — images stay 403/400 even with a correct bucket policy.
 
 **Full bucket policy** (keeps your IAM user + adds public read for published media):
 
@@ -72,8 +73,9 @@ Fallback proxy upload (`/api/admin/upload`) still exists but admin uses the dire
 
 ### Image & video on the public site
 
-- **Images:** served via **Next.js Image** (`/_next/image`) — resized WebP/AVIF, cached on your server. Requires public `GetObject` on `projects/*` so the optimizer can fetch S3.
-- **Videos:** there is no `next/video` optimizer in Next 14; MP4/WebM are streamed with `<video>` from S3 (fast with CDN; use CloudFront for production).
+- **S3 images:** optimized via **`/_next/image`** (WebP/AVIF, responsive widths). Project cards use a small `sizes` hint (~28–52vw); the enlarged gallery requests ~92vw. Requires public `GetObject` on `projects/*` so the Next server can fetch from S3, plus `sharp` in the Docker image (already in `package.json`).
+- **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14).
+- **Legacy non-S3 images** (e.g. Contentful): still use `/_next/image` optimization where configured.
 
 ## 2) Create RDS PostgreSQL
 1. Open AWS Console -> RDS -> Create database.

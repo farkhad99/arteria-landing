@@ -12,10 +12,6 @@ import Link from 'next/link'
 import s from './header.module.scss'
 
 const Stard = dynamic(() => import('icons/stard.svg'), { ssr: false })
-const Monogram = dynamic(() => import('icons/sf-monogram.svg'), { ssr: false })
-const StarDuotone = dynamic(() => import('icons/star-duotone.svg'), {
-  ssr: false,
-})
 
 export const Header = ({ principles = [], contact }) => {
   const isMobile = useMediaQuery('(max-width: 800px)')
@@ -31,25 +27,13 @@ export const Header = ({ principles = [], contact }) => {
       <div className={cn(s.top, 'layout-grid')}>
         <div className={s.eggs}>
           <Link
-            name="easter egg"
+            name="X profile"
             className={s.egg}
-            href="https://github.com/studio-freight/sf-website"
+            href="https://x.com/denkegut"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Stard />
-          </Link>
-          <Link
-            name="easter egg - soundboard"
-            className={s.egg}
-            href="https://soundboard.studiofreight.com"
-          >
-            <Monogram />
-          </Link>
-          <Link
-            name="easter egg - pale blue dot"
-            className={s.egg}
-            href="https://youtu.be/GO5FwsblpT8"
-          >
-            <StarDuotone />
           </Link>
         </div>
         {isMobile === false && (
