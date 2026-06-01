@@ -25,7 +25,7 @@ const Gallery = dynamic(
   },
 )
 
-export default function Home({ arteriaStudio, footer, contact, projects }) {
+export default function Home({ arteriaStudio, contact, projects }) {
   const router = useRouter()
 
   const [showInfoModal, setShowInfoModal] = useState(false)
