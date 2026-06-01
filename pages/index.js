@@ -1,5 +1,5 @@
 import { Link } from '@studio-freight/compono'
-import { useMediaQuery } from '@darkroom.engineering/hamo'
+import { useIsDesktop } from 'lib/breakpoint'
 import va from '@vercel/analytics'
 import cn from 'clsx'
 import {
@@ -33,7 +33,7 @@ export default function Home({ arteriaStudio, contact, projects }) {
 
   const [showInfoModal, setShowInfoModal] = useState(false)
   const [resetScroll, setResetScroll] = useState(false)
-  const isDesktop = useMediaQuery('(min-width: 800px)')
+  const isDesktop = useIsDesktop()
   const [selectedProject, setSelectedProject] = useStore((state) => [
     state.selectedProject,
     state.setSelectedProject,

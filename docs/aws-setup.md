@@ -74,6 +74,25 @@ Fallback proxy upload (`/api/admin/upload`) still exists but admin uses the dire
 ### Image & video on the public site
 
 - **S3 images:** optimized via **`/_next/image`** (WebP/AVIF, responsive widths). Project cards use a small `sizes` hint (~28–52vw); the enlarged gallery requests ~92vw. Requires public `GetObject` on `projects/*` so the Next server can fetch from S3, plus `sharp` in the Docker image (already in `package.json`).
+
+#### `"url" parameter is not allowed` (400 on `/_next/image`)
+
+This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was **not** in `next.config.js` at **`next build`** time.
+
+| Symptom | Cause |
+|--------|--------|
+| Admin preview works, public site 400 | Admin uses plain `<img src="https://…s3…">`; visitors use `/_next/image`, which needs an allowlisted host. |
+| Direct S3 URL works in incognito, `/_next/image` 400 | Bucket policy is fine; redeploy after fixing `images.remotePatterns` / `images.domains`. |
+| Still broken after policy change | Production container is still running an **old Docker image** built before config changes. Push to `main` and let deploy rebuild. |
+
+**Checklist**
+
+1. `AWS_REGION` and `AWS_S3_BUCKET` GitHub secrets match the bucket used in stored `fileUrl` values (e.g. `arteria-uploads.s3.eu-north-1.amazonaws.com`).
+2. Push changes and run a full deploy (`docker build` on EC2 — not just `docker restart`).
+3. After deploy, open in incognito:  
+   `https://your-domain/_next/image?url=https%3A%2F%2Farteria-uploads.s3.eu-north-1.amazonaws.com%2Fprojects%2F<one-file>.jpg&w=640&q=75`  
+   You should get an image (200), not JSON with `"url" parameter is not allowed`.
+4. `npm run build` locally runs `scripts/verify-image-config.js` and fails if S3 hosts are missing from the baked allowlist.
 - **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14).
 - **Legacy non-S3 images** (e.g. Contentful): still use `/_next/image` optimization where configured.
 

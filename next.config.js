@@ -1,20 +1,11 @@
 const path = require('path')
+const {
+  getS3ImageHostsFromEnv,
+  getS3RemotePatterns,
+} = require('./lib/s3-image-hosts.cjs')
 
-const s3Bucket = process.env.AWS_S3_BUCKET || 'arteria-uploads'
-const s3Region = process.env.AWS_REGION || 'eu-north-1'
-const s3Hostname = `${s3Bucket}.s3.${s3Region}.amazonaws.com`
-
-const s3ImageHosts = [
-  s3Hostname,
-  'arteria-uploads.s3.eu-north-1.amazonaws.com',
-  'arteria-uploads.s3.eu-central-1.amazonaws.com',
-].filter((host, index, list) => list.indexOf(host) === index)
-
-const s3RemotePatterns = s3ImageHosts.map((hostname) => ({
-  protocol: 'https',
-  hostname,
-  pathname: '/**',
-}))
+const s3ImageHosts = getS3ImageHostsFromEnv()
+const s3RemotePatterns = getS3RemotePatterns()
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({
 //   enabled: process.env.ANALYZE === 'true',
 // })
@@ -35,16 +26,19 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'assets.studiofreight.com',
+        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'www.google.com',
+        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com',
+        port: '',
         pathname: '/**',
       },
       ...s3RemotePatterns,

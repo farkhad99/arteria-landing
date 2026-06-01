@@ -1,12 +1,12 @@
 import { Image, Link } from '@studio-freight/compono'
-import { useMediaQuery } from '@darkroom.engineering/hamo'
+import { useIsMobile } from 'lib/breakpoint'
 import va from '@vercel/analytics'
 import cn from 'clsx'
 import { Separator } from 'components/separator'
 import s from './footer.module.scss'
 
 export function Footer({ className, style }) {
-  const isMobile = useMediaQuery('(max-width: 800px)')
+  const isMobile = useIsMobile()
   const footerPhone = '+998996924479'
   const footerEmail = 'segeayupov@gmail.com'
 
@@ -23,7 +23,7 @@ export function Footer({ className, style }) {
           Capabilities Deck ↓
         </a>
 
-        <ul className={s.column}>
+        <ul className={cn(s.column, s.contact)}>
           <li>
             <Link className="p-s decorate" href={`tel:${footerPhone}`}>
               P: {footerPhone}
@@ -36,24 +36,14 @@ export function Footer({ className, style }) {
           </li>
         </ul>
 
-        {isMobile === false && (
-          <ul className={s.column}>
-            <li className="p-s text-muted">
-              &copy; {new Date().getFullYear()}
-            </li>
-          </ul>
-        )}
-
-        {isMobile === true && (
-          <ul className={s.column}>
-            <li className="p-s text-muted">
-              &copy; {new Date().getFullYear()}
-            </li>
-          </ul>
-        )}
+        <ul className={s.column}>
+          <li className="p-s text-muted">
+            &copy; {new Date().getFullYear()}
+          </li>
+        </ul>
       </div>
 
-      {isMobile === true && (
+      {isMobile && (
         <section className={s['footer-image']}>
           <Image
             src="/mobile-temp-images/footer.png"

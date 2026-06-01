@@ -1,5 +1,5 @@
 import { Marquee } from '@studio-freight/compono'
-import { useMediaQuery } from '@darkroom.engineering/hamo'
+import { useIsMobile } from 'lib/breakpoint'
 import va from '@vercel/analytics'
 import cn from 'clsx'
 import { ContactForm } from 'components/header/contact-form'
@@ -14,7 +14,7 @@ import s from './header.module.scss'
 const Stard = dynamic(() => import('icons/stard.svg'), { ssr: false })
 
 export const Header = ({ principles = [], contact }) => {
-  const isMobile = useMediaQuery('(max-width: 800px)')
+  const isMobile = useIsMobile()
 
   // const visible = usePageAppear()
   const [contactIsOpen, setContactIsOpen] = useStore((state) => [
@@ -36,7 +36,7 @@ export const Header = ({ principles = [], contact }) => {
             <Stard />
           </Link>
         </div>
-        {isMobile === false && (
+        {!isMobile && (
           <Marquee className={s.marquee} duration={20}>
             {principles.map((principle, i) => (
               <p key={i} className={cn('p', s.principle)}>
@@ -63,7 +63,7 @@ export const Header = ({ principles = [], contact }) => {
       </div>
       <Separator />
 
-      {isMobile === true && (
+      {isMobile && (
         <Marquee className={s.marquee} duration={20}>
           {principles.map((principle, i) => (
             <p key={i} className={cn('p', s.principle)}>
