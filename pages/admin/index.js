@@ -1,8 +1,8 @@
 import { MediaDropzone } from 'components/admin/media-dropzone'
 import { ProjectDrawer } from 'components/admin/project-drawer'
 import { clearSessionCookie, isAdminAuthenticated } from 'lib/admin-auth'
+import { uploadFileToS3 } from 'lib/admin-s3-upload'
 import { parseApiResponse } from 'lib/parse-api-response'
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from 'lib/upload-limits'
 import cn from 'clsx'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import s from './admin.module.scss'
@@ -122,34 +122,7 @@ export default function AdminPage({ authenticated }) {
     fetchProjects()
   }, [isAuthenticated])
 
-  const uploadFile = useCallback(async (file) => {
-    if (file.size > MAX_UPLOAD_BYTES) {
-      throw new Error(`File exceeds ${MAX_UPLOAD_LABEL} limit`)
-    }
-
-    const uploadResponse = await fetch('/api/admin/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': file.type,
-        'X-Filename': file.name,
-      },
-      body: file,
-    })
-
-    const { data: payload } = await parseApiResponse(uploadResponse)
-    if (!uploadResponse.ok) {
-      throw new Error(payload.error || 'Failed to upload file')
-    }
-
-    return {
-      kind: payload.kind,
-      title: file.name,
-      url: payload.fileUrl,
-      s3Key: payload.key,
-      contentType: payload.contentType,
-      columnSpan: 'two_columns',
-    }
-  }, [])
+  const uploadFile = useCallback((file) => uploadFileToS3(file), [])
 
   const openCreateDrawer = () => {
     setEditingId(null)

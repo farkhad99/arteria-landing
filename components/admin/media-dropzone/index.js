@@ -1,4 +1,6 @@
 import cn from 'clsx'
+import { OptimizedVideo } from 'components/optimized-video'
+import { isVideoUrl } from 'lib/media-url'
 import { MAX_UPLOAD_LABEL } from 'lib/upload-limits'
 import { useCallback, useRef, useState } from 'react'
 import s from './media-dropzone.module.scss'
@@ -18,11 +20,14 @@ export function MediaDropzone({
   const inputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingIds, setUploadingIds] = useState([])
+  const uploadLock = useRef(false)
 
   const uploadFiles = useCallback(
     async (fileList) => {
       const files = Array.from(fileList || [])
-      if (!files.length) return
+      if (!files.length || uploadLock.current) return
+
+      uploadLock.current = true
 
       for (const file of files) {
         const pendingId = `pending-${Date.now()}-${Math.random()}`
@@ -44,6 +49,8 @@ export function MediaDropzone({
           setUploadingIds((prev) => prev.filter((id) => id !== pendingId))
         }
       }
+
+      uploadLock.current = false
     },
     [onItemsChange, onUploadFile, onStatus],
   )
@@ -76,8 +83,8 @@ export function MediaDropzone({
             key={item.id || item.url || `media-${index}`}
           >
             <div className={s.preview}>
-              {item.kind === 'video' ? (
-                <video src={item.url} muted playsInline controls />
+              {item.kind === 'video' || isVideoUrl(item.url) ? (
+                <OptimizedVideo src={item.url} className={s.videoPreview} />
               ) : (
                 <img src={item.url} alt={item.title || 'Media'} />
               )}

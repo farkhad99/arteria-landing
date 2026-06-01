@@ -13,9 +13,67 @@ This repository includes a direct EC2 deployment workflow for fastest setup, whi
 4. Keep Block Public Access enabled.
 5. Create bucket.
 
-Add a bucket policy for read access only if you need public direct URLs from the app. Prefer CloudFront signed delivery for stricter control in production.
+**Public read for project files (required):** your app user (`arteria-dev`) can upload, but **visitors and Next.js Image** are anonymous. Without a public `GetObject` rule on `projects/*`, images return 403/400 on the site and in admin previews.
 
-Admin media uploads go through `/api/admin/upload` on your Next.js server (server-side `PutObject` to S3). You do **not** need S3 CORS rules for browser uploads.
+**Block Public Access:** edit bucket → Permissions → Block Public Access → uncheck only:
+
+- *Block public access to buckets and objects granted through **new public bucket policies***
+
+Leave the other three Block Public Access settings **on**.
+
+**Full bucket policy** (keeps your IAM user + adds public read for published media):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowArteriaAppUser",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::234951665388:user/arteria-dev"
+      },
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::arteria-uploads/*"
+    },
+    {
+      "Sid": "AllowListBucket",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::234951665388:user/arteria-dev"
+      },
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::arteria-uploads"
+    },
+    {
+      "Sid": "PublicReadProjectMedia",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::arteria-uploads/projects/*"
+    }
+  ]
+}
+```
+
+After saving, open one uploaded file URL in an incognito window — it should load without signing in.
+
+### S3 CORS (required for fast admin uploads)
+
+Uploads use **presigned URLs**: the browser sends files **directly to S3** (not through EC2). Apply the CORS config in [s3-cors.json](./s3-cors.json) on your bucket (S3 → bucket → Permissions → CORS). Add your production domain to `AllowedOrigins` if it is not listed.
+
+Flow: `POST /api/admin/upload-url` → browser `PUT` to S3 → save `fileUrl` on the project.
+
+Fallback proxy upload (`/api/admin/upload`) still exists but admin uses the direct path.
+
+### Image & video on the public site
+
+- **Images:** served via **Next.js Image** (`/_next/image`) — resized WebP/AVIF, cached on your server. Requires public `GetObject` on `projects/*` so the optimizer can fetch S3.
+- **Videos:** there is no `next/video` optimizer in Next 14; MP4/WebM are streamed with `<video>` from S3 (fast with CDN; use CloudFront for production).
 
 ## 2) Create RDS PostgreSQL
 1. Open AWS Console -> RDS -> Create database.

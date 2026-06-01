@@ -1,5 +1,7 @@
 import { Image } from '@studio-freight/compono'
 import cn from 'clsx'
+import { OptimizedVideo } from 'components/optimized-video'
+import { isVideoUrl } from 'lib/media-url'
 import s from './composable-image.module.scss'
 
 export function ComposableImage({
@@ -11,33 +13,27 @@ export function ComposableImage({
   priority = false,
 }) {
   const amount = sources.items.length
+
   return (
     <div className={s.images}>
-      {sources.items.map((source) =>
-        source.url.includes('videos.ctfassets.net') ? (
-          <div
-            className={cn(
-              s.image,
-              s.videoWrap,
-              large && s.large,
-              small && s.small,
-            )}
-            key={source.url}
-          >
-            <video
-              src={source.url}
-              muted
-              loop
-              autoPlay
-              playsInline
-              preload="auto"
+      {sources.items.map((source) => {
+        const url = source.url
+
+        if (isVideoUrl(url)) {
+          return (
+            <OptimizedVideo
+              key={url}
+              src={url}
+              className={cn(s.image, s.videoWrap, large && s.large, small && s.small)}
             />
-          </div>
-        ) : (
+          )
+        }
+
+        return (
           <Image
-            key={source.url}
-            src={source.url}
-            alt={source.title}
+            key={url}
+            src={url}
+            alt={source.title || ''}
             width={width / amount}
             height={height}
             className={cn(s.image, large && s.large, small && s.small)}
@@ -46,8 +42,8 @@ export function ComposableImage({
             quality={95}
             sizes="(max-width: 768px) 100vw, 75vw"
           />
-        ),
-      )}
+        )
+      })}
     </div>
   )
 }

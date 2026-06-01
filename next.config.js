@@ -28,10 +28,22 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.amazonaws.com',
+        hostname: '**.amazonaws.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.s3.*.amazonaws.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'arteria-uploads.s3.eu-north-1.amazonaws.com',
+        pathname: '/projects/**',
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
   },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],

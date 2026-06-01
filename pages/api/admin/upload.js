@@ -8,14 +8,6 @@ export const config = {
   },
 }
 
-const readRequestBody = (req) =>
-  new Promise((resolve, reject) => {
-    const chunks = []
-    req.on('data', (chunk) => chunks.push(chunk))
-    req.on('end', () => resolve(Buffer.concat(chunks)))
-    req.on('error', reject)
-  })
-
 export default async function handler(req, res) {
   if (!isAdminAuthenticated(req)) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -35,25 +27,27 @@ export default async function handler(req, res) {
       })
     }
 
-    const body = await readRequestBody(req)
-    if (!body.length) {
-      return res.status(400).json({ error: 'Empty upload body' })
-    }
-
-    if (body.length > MAX_UPLOAD_BYTES) {
+    const contentLength = Number(req.headers['content-length'] || 0)
+    if (contentLength > MAX_UPLOAD_BYTES) {
       return res.status(413).json({
         error: `File exceeds maximum size of ${MAX_UPLOAD_LABEL}`,
       })
     }
 
     const key = createUploadKey({ filename: String(filename) })
-    const { fileUrl } = await uploadObject({ key, contentType, body })
+    const { fileUrl } = await uploadObject({
+      key,
+      contentType,
+      body: req,
+    })
 
     return res.status(200).json({
       key,
       fileUrl,
+      url: fileUrl,
       kind: String(contentType).startsWith('video/') ? 'video' : 'image',
       contentType,
+      size: contentLength || undefined,
     })
   } catch (error) {
     return res.status(400).json({ error: error.message })
