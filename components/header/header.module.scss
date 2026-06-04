@@ -93,12 +93,12 @@
 
     .title {
       grid-column: 1/-1;
-      margin: desktop-vw(14px) 0;
+      margin: mobile-vw(10px) 0;
       width: 100%;
       overflow: hidden;
 
-      @include mobile {
-        margin: mobile-vw(10px) 0;
+      @include desktop {
+        margin: 12px 0 8px;
       }
     }
   }

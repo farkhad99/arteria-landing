@@ -2,11 +2,18 @@
   width: 100%;
   margin: 0;
   padding: 0;
-  line-height: 1;
+  font-weight: 700;
+  line-height: 0.92;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   text-shadow: none;
   text-align: left;
+  font-size: mobile-vw(43px);
+
+  @include desktop {
+    font-size: 72px;
+    line-height: 1;
+  }
 }
 
 .viewport {
@@ -17,13 +24,13 @@
 .track {
   display: flex;
   width: max-content;
-  animation: marquee-left 14s linear infinite;
+  gap: 0.6em;
+  animation: marquee-left 28s linear infinite;
   will-change: transform;
 }
 
 .slide {
   flex-shrink: 0;
-  padding-right: 0.35em;
   white-space: nowrap;
 }
 
@@ -41,10 +48,12 @@
   .track {
     animation: none;
     width: 100%;
-    justify-content: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.4em;
   }
 
-  .slide:last-child {
+  .slide:nth-child(n + 2) {
     display: none;
   }
 }
