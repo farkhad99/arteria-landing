@@ -8,10 +8,10 @@
   text-transform: uppercase;
   text-shadow: none;
   text-align: left;
-  font-size: mobile-vw(43px);
+  font-size: font-mobile-vw(43px);
 
   @include desktop {
-    font-size: 72px;
+    font-size: font-ui-px(72);
     line-height: 1;
   }
 }

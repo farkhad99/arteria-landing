@@ -113,11 +113,11 @@
     gap: mobile-vw(8px);
     text-transform: uppercase;
     color: var(--grey);
-    font-size: mobile-vw(11px);
+    font-size: font-mobile-vw(11px);
 
     @include desktop {
       gap: desktop-vw(8px);
-      font-size: desktop-vw(11px);
+      font-size: font-desktop-vw(11px);
     }
   }
 

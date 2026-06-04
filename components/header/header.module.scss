@@ -62,8 +62,6 @@
       @include desktop {
         grid-column: 8/-1;
 
-        @include ultrawide-chrome-font;
-
         @media (min-width: 2560px) {
           padding: desktop-vw-capped(4px) desktop-vw-capped(8px);
           border-radius: desktop-vw-capped(8px);
@@ -84,7 +82,6 @@
         transition: filter 300ms ease-in-out;
         filter: blur(1.5px);
 
-        @include ultrawide-chrome-font;
       }
 
       @include hover {

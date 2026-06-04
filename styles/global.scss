@@ -10,6 +10,12 @@
 @import './_scroll.scss';
 
 :root {
+  --font-scale: 1;
+
+  @media (min-width: #{$ultrawide-min-width}) {
+    --font-scale: #{$ultrawide-font-scale};
+  }
+
   --header-height: #{mobile-vw(58px)};
 
   @include desktop {

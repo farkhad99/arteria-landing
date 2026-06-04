@@ -42,9 +42,6 @@
   @include desktop {
     padding: desktop-vw-capped(16px) 0 desktop-vw-capped(24px) 0;
 
-    :global(.p-s) {
-      @include ultrawide-chrome-font;
-    }
   }
 
   @include wide-short-viewport {

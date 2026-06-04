@@ -27,13 +27,6 @@
   }
 }
 
-/** Header/footer chrome — same capped size on ultrawide (stops vw from ballooning) */
-@mixin ultrawide-chrome-font {
-  @media (min-width: 2560px) {
-    font-size: desktop-vw-capped(25px);
-  }
-}
-
 @function mobile-vw($pixels, $base-vw: $mobile-width) {
   @return math.div($pixels * 100vw, $base-vw);
 }
@@ -60,6 +53,30 @@
 @function desktop-vh-capped($pixels, $base-vh: $desktop-height) {
   $vh: math.div($pixels * 100, $base-vh);
   @return unquote('min(#{$vh}vh, #{$pixels})');
+}
+
+/** Font sizes — scaled by `--font-scale` on ultrawide (see global.scss) */
+@function font-mobile-vw($pixels, $base-vw: $mobile-width) {
+  $vw: math.div($pixels * 100, $base-vw);
+  @return unquote('calc(#{$vw}vw * var(--font-scale, 1))');
+}
+
+@function font-desktop-vw($pixels, $base-vw: $desktop-width) {
+  $vw: math.div($pixels * 100, $base-vw);
+  @return unquote('calc(#{$vw}vw * var(--font-scale, 1))');
+}
+
+@function font-desktop-vh($pixels, $base-vh: $desktop-height) {
+  $vh: math.div($pixels * 100, $base-vh);
+  @return unquote('calc(#{$vh}vh * var(--font-scale, 1))');
+}
+
+@function font-desktop-vw-capped($pixels, $base-vw: $desktop-width) {
+  @return unquote('calc(#{desktop-vw-capped($pixels, $base-vw)} * var(--font-scale, 1))');
+}
+
+@function font-ui-px($pixels) {
+  @return unquote('calc(#{$pixels}px * var(--font-scale, 1))');
 }
 
 @function columns($columns) {

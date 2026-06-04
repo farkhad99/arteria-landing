@@ -56,7 +56,7 @@ html.has-scroll-smooth {
 
 .button {
   color: var(--green);
-  font-size: mobile-vw(14px);
+  font-size: font-mobile-vw(14px);
   padding: mobile-vw(4px) mobile-vw(8px);
   border-radius: mobile-vw(8px);
   border: 1px solid;
@@ -66,7 +66,7 @@ html.has-scroll-smooth {
   user-select: none;
 
   @include desktop {
-    font-size: desktop-vw(16px);
+    font-size: font-desktop-vw(16px);
     padding: desktop-vw(4px) desktop-vw(8px);
     border-radius: desktop-vw(8px);
   }

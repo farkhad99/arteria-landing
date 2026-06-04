@@ -98,7 +98,7 @@
     .testimonial {
       p:last-child {
         font-style: italic;
-        font-size: mobile-vw(15px);
+        font-size: font-mobile-vw(15px);
         line-height: 130%;
         font-family: var(--font-tertiary);
       }
@@ -114,7 +114,7 @@
       .services {
         p:last-child {
           font-family: var(--font-secondary);
-          font-size: mobile-vw(10px);
+          font-size: font-mobile-vw(10px);
         }
       }
     }

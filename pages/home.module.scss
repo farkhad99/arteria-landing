@@ -197,7 +197,7 @@
       .testimonial {
         p:last-child {
           font-style: italic;
-          font-size: desktop-vh(18px);
+          font-size: font-desktop-vh(18px);
           line-height: 130%;
           font-family: var(--font-tertiary);
         }

@@ -1,6 +1,9 @@
 /* Breakpoints */
 $mobile-breakpoint: 800px;
 $ultra-wide-breakpoint: 3000px;
+$ultrawide-min-width: 2560px;
+/** Multiply all `font-*` helpers on viewports >= $ultrawide-min-width (0.6 = 40% smaller) */
+$ultrawide-font-scale: 0.6;
 
 // Viewport Sizes
 $desktop-width: 1440px;

@@ -6,7 +6,7 @@
 
 .h1 {
   text-align: center;
-  font-size: mobile-vw(43px);
+  font-size: font-mobile-vw(43px);
   font-style: normal;
   font-weight: 700;
   line-height: 92%;
@@ -14,12 +14,12 @@
   text-transform: uppercase;
 
   @include desktop {
-    font-size: desktop-vw(178px);
+    font-size: font-desktop-vw(178px);
   }
 }
 
 .p {
-  font-size: mobile-vw(16px);
+  font-size: font-mobile-vw(16px);
   font-style: normal;
   font-weight: 400;
   line-height: 125%;
@@ -27,12 +27,12 @@
 
   @include desktop {
     line-height: 140%;
-    font-size: desktop-vw(16px);
+    font-size: font-desktop-vw(16px);
   }
 }
 
 .p-s {
-  font-size: mobile-vw(12px);
+  font-size: font-mobile-vw(12px);
   font-style: normal;
   font-weight: 400;
   line-height: 125%;
@@ -40,18 +40,18 @@
   text-transform: uppercase;
 
   @include desktop {
-    font-size: desktop-vw(12px);
+    font-size: font-desktop-vw(12px);
   }
 }
 
 .p-xs {
-  font-size: mobile-vw(8px);
+  font-size: font-mobile-vw(8px);
   font-style: normal;
   font-weight: 400;
   line-height: 125%;
 
   @include desktop {
-    font-size: desktop-vw(12px);
+    font-size: font-desktop-vw(12px);
   }
 }
 
