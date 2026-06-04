@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       include: {
         media: { orderBy: { sortOrder: 'asc' } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
     return res.status(200).json({ items: projects })
   }
@@ -40,9 +40,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'name is required' })
       }
 
+      const { _max } = await prisma.project.aggregate({
+        _max: { sortOrder: true },
+      })
+      const nextSortOrder = (_max.sortOrder ?? -1) + 1
+
       const project = await prisma.project.create({
         data: {
           name,
+          sortOrder: nextSortOrder,
           industry: industry || null,
           body: body || null,
           testimonial: testimonial || null,

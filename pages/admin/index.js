@@ -1,4 +1,5 @@
 import { MediaDropzone } from 'components/admin/media-dropzone'
+import { ProjectSortList } from 'components/admin/project-sort-list'
 import { ProjectDrawer } from 'components/admin/project-drawer'
 import { clearSessionCookie, isAdminAuthenticated } from 'lib/admin-auth'
 import { uploadFileToS3 } from 'lib/admin-s3-upload'
@@ -282,54 +283,13 @@ export default function AdminPage({ authenticated }) {
                 Add project
               </button>
             </div>
-            <div className={s.tableWrap}>
-              <table className={s.table}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Industry</th>
-                    <th>Media</th>
-                    <th>Updated</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.length === 0 && (
-                    <tr>
-                      <td className={s.muted} colSpan={5}>
-                        No projects yet. Click Add project.
-                      </td>
-                    </tr>
-                  )}
-                  {projects.map((project) => (
-                    <tr key={project.id}>
-                      <td>{project.name}</td>
-                      <td>{project.industry || '-'}</td>
-                      <td>{project.media?.length || 0}</td>
-                      <td>{new Date(project.updatedAt).toLocaleString()}</td>
-                      <td>
-                        <div className={s.rowActions}>
-                          <button
-                            className={s.button}
-                            type="button"
-                            onClick={() => startEdit(project)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className={cn(s.button, s.danger)}
-                            type="button"
-                            onClick={() => deleteProject(project.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ProjectSortList
+              projects={projects}
+              onProjectsChange={setProjects}
+              onEdit={startEdit}
+              onDelete={deleteProject}
+              onStatus={setStatus}
+            />
           </section>
         )}
 

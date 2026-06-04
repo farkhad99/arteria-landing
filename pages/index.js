@@ -312,7 +312,7 @@ export async function getServerSideProps() {
   try {
     const dbProjects = await prisma.project.findMany({
       include: { media: { orderBy: { sortOrder: 'asc' } } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
 
     const items = dbProjects.map((project) => ({
