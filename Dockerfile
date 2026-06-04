@@ -10,6 +10,8 @@ ARG AWS_S3_BUCKET=arteria-uploads
 ARG AWS_REGION=eu-north-1
 ENV AWS_S3_BUCKET=$AWS_S3_BUCKET
 ENV AWS_REGION=$AWS_REGION
+# Production uses /_next/image for S3 (see lib/s3-image-settings.js). Override only if optimizer 400s:
+# ENV NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate

@@ -7,6 +7,15 @@ export default function Document() {
       <Head>
         <meta charSet="UTF-8" />
         <link
+          rel="preconnect"
+          href="https://arteria-uploads.s3.eu-north-1.amazonaws.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://arteria-uploads.s3.eu-north-1.amazonaws.com"
+        />
+        <link
           href="/fonts/GTAlpina-ThIt.woff2"
           as="font"
           rel="preload prefetch"

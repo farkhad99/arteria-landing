@@ -61,10 +61,10 @@ export const ProjectAccordion = ({ data }) => {
               <Slider enableAutoplay={!!active} className={s.slides}>
                 {item.assetsCollection.items.map((asset, i) => (
                   <ComposableImage
+                    variant="cardSmall"
                     sources={asset.imagesCollection}
                     key={i}
-                    width={343}
-                    height={211}
+                    priority={i === 0 && !!active}
                     small
                   />
                 ))}

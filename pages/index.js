@@ -219,10 +219,9 @@ export default function Home({ arteriaStudio, contact, projects }) {
                           }}
                         >
                           <ComposableImage
+                            variant="card"
                             sources={asset.imagesCollection}
                             priority={i === 0}
-                            width={1026}
-                            height={604}
                             sizes={
                               asset.columnSpan === 'ONE_COLUMN'
                                 ? PROJECT_CARD_SIZES.oneColumn

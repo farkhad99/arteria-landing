@@ -1,40 +1,72 @@
 import cn from 'clsx'
 import { OptimizedVideo } from 'components/optimized-video'
+import {
+  GALLERY_IMAGE_SIZES,
+  IMAGE_DIMENSIONS,
+  IMAGE_QUALITY,
+  MOBILE_CARD_SIZES,
+  PROJECT_CARD_SIZES,
+} from 'lib/media-delivery'
 import { shouldUnoptimizeImage } from 'lib/s3-image-settings'
 import { isVideoUrl } from 'lib/media-url'
 import NextImage from 'next/image'
 import s from './composable-image.module.scss'
 
-/** Project panel thumbnails — keep srcset widths small */
-export const PROJECT_CARD_SIZES = {
-  oneColumn: '(max-width: 800px) 100vw, 28vw',
-  twoColumns: '(max-width: 800px) 100vw, 52vw',
-}
+export {
+  GALLERY_IMAGE_SIZES,
+  MOBILE_CARD_SIZES,
+  PROJECT_CARD_SIZES,
+} from 'lib/media-delivery'
 
-/** Full-screen gallery — larger optimized variants */
-export const GALLERY_IMAGE_SIZES = '(max-width: 800px) 100vw, 92vw'
+const VARIANT_PRESETS = {
+  card: {
+    sizes: PROJECT_CARD_SIZES.twoColumns,
+    quality: IMAGE_QUALITY.card,
+    ...IMAGE_DIMENSIONS.card,
+  },
+  cardSmall: {
+    sizes: MOBILE_CARD_SIZES,
+    quality: IMAGE_QUALITY.mobile,
+    ...IMAGE_DIMENSIONS.cardSmall,
+  },
+  gallery: {
+    sizes: GALLERY_IMAGE_SIZES,
+    quality: IMAGE_QUALITY.gallery,
+    ...IMAGE_DIMENSIONS.gallery,
+  },
+}
 
 export function ComposableImage({
   sources,
-  width = 684,
-  height = 403,
+  width,
+  height,
   large = false,
   small = false,
   priority = false,
   sizes,
   quality,
+  variant,
 }) {
+  const presetKey =
+    variant || (large ? 'gallery' : small ? 'cardSmall' : 'card')
+  const preset = VARIANT_PRESETS[presetKey] || VARIANT_PRESETS.card
+
+  const displayWidth = width ?? preset.width
+  const displayHeight = height ?? preset.height
+  const imageSizes = sizes ?? preset.sizes
+  const imageQuality = quality ?? preset.quality
+
   const amount = sources.items.length
-  const imageSizes = sizes ?? (large ? GALLERY_IMAGE_SIZES : PROJECT_CARD_SIZES.twoColumns)
-  const imageQuality = quality ?? (large ? 92 : 80)
 
   return (
     <div className={s.images}>
-      {sources.items.map((source) => {
+      {sources.items.map((source, index) => {
         const url = source.url
-        const itemWidth = Math.round(width / amount)
+        const itemWidth = Math.round(displayWidth / amount)
+        const itemHeight = Math.round(displayHeight / amount)
         const className = cn(s.image, large && s.large, small && s.small)
-        const style = { '--height': height, '--width': itemWidth }
+        const style = { '--height': itemHeight, '--width': itemWidth }
+        const isPriority = priority && index === 0
 
         if (isVideoUrl(url)) {
           return (
@@ -42,6 +74,7 @@ export function ComposableImage({
               key={url}
               src={url}
               className={cn(className, s.videoWrap)}
+              priority={isPriority}
             />
           )
         }
@@ -52,10 +85,12 @@ export function ComposableImage({
             src={url}
             alt={source.title || ''}
             width={itemWidth}
-            height={height}
+            height={itemHeight}
             className={className}
             style={style}
-            priority={priority}
+            priority={isPriority}
+            loading={isPriority ? undefined : 'lazy'}
+            fetchPriority={isPriority ? 'high' : 'low'}
             quality={imageQuality}
             sizes={imageSizes}
             unoptimized={shouldUnoptimizeImage(url)}

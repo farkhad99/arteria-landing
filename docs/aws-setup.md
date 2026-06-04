@@ -94,7 +94,14 @@ This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was *
    You should get an image (200), not JSON with `"url" parameter is not allowed`.
 4. `npm run build` locally runs `scripts/verify-image-config.js` and fails if S3 hosts are missing from the baked allowlist.
 
-**Current default:** project images on S3 use **`unoptimized`** (browser loads the public S3 URL directly), so they work even if production is still on an old Docker image that rejects `/_next/image`. After a successful deploy with an updated allowlist, you can set GitHub secret / env `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` to re-enable WebP/AVIF via `/_next/image`.
+**Production default:** S3 JPEG/PNG/WebP go through **`/_next/image`** (WebP/AVIF, ~520px wide for project cards). GIFs stay direct from S3 (animation). If `/_next/image` returns 400 again, set build env `NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true` and redeploy.
+
+**Fast delivery checklist**
+
+- Project cards: `sizes` capped ~280–520px, quality 68, first asset `priority` + `fetchPriority="high"`.
+- Gallery images load only when the gallery is opened.
+- MP4/WebM: lazy until near viewport (`OptimizedVideo`); compress uploads (H.264, ≤1080p).
+- Optional dev test: `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` in `.env.local`.
 
 Compare build IDs: local `cat .next/BUILD_ID` vs view page source on production (`buildId` in `__NEXT_DATA__`). If they differ, production has not picked up the latest deploy.
 - **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14). Compress MP4/WebM before upload for best performance; optional poster images are not generated automatically yet.
