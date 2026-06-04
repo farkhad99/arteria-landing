@@ -135,7 +135,7 @@ jobs:
             --build-arg AWS_REGION="$AWS_REGION" \
             -t arteria-landing:latest .
           docker rm -f arteria-landing >/dev/null 2>&1 || true
-          docker run --rm "${docker_env[@]}" arteria-landing:latest npx prisma migrate deploy
+          docker run --rm "${docker_env[@]}" arteria-landing:latest npm run prisma:migrate:deploy
           docker run -d --name arteria-landing --restart unless-stopped \
             "${docker_env[@]}" \
             -p 3000:3000 arteria-landing:latest

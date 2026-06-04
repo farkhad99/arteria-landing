@@ -167,7 +167,7 @@ Set these on your runtime host:
 ## 5) Run database migration
 After first deploy:
 1. `npx prisma generate`
-2. `npx prisma migrate deploy`
+2. `npm run prisma:migrate:deploy` (inside Docker on deploy)
 
 ## 6) Telegram bot setup
 1. Create bot via [@BotFather](https://t.me/BotFather), get token.
