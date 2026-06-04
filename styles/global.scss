@@ -47,6 +47,12 @@ body {
 
 body {
   min-height: 100vh;
+
+  @include desktop {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
 }
 
 // custom cursor

@@ -1,7 +1,13 @@
 .content {
   align-items: start;
   height: 100%;
+  max-height: 100%;
+  min-height: 0;
   padding: desktop-vw-capped(18px) 0 desktop-vw-capped(24px) 0;
+
+  @include tablet {
+    padding: desktop-vh-capped(14px) 0 desktop-vh-capped(18px) 0;
+  }
 
   @include wide-short-viewport {
     padding: 12px 0 14px;
@@ -223,6 +229,7 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+  min-height: 0;
 
   &:before {
     content: '';

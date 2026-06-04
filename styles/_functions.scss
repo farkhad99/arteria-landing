@@ -9,13 +9,26 @@
 }
 
 @mixin desktop {
-  @media (min-width: #{$mobile-breakpoint}) {
+  @media (min-width: #{$mobile-breakpoint + 1}) {
+    @content;
+  }
+}
+
+/** iPad / tablet: desktop grid, fonts scale with viewport height */
+@mixin tablet {
+  @media (min-width: #{$mobile-breakpoint + 1}) and (max-width: #{$tablet-max-width}) {
     @content;
   }
 }
 
 @mixin ultra-wide {
   @media (min-width: #{$ultra-wide-breakpoint}) {
+    @content;
+  }
+}
+
+@mixin ultrawide {
+  @media (min-width: #{$ultrawide-min-width}) {
     @content;
   }
 }

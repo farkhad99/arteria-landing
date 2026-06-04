@@ -48,6 +48,96 @@
     padding: 10px 0 12px;
   }
 
+  @include ultrawide {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0;
+    row-gap: 0;
+    grid-template-columns: unset !important;
+    padding: 2px 0 3px;
+
+    > a,
+    > .column {
+      grid-column: unset !important;
+      align-self: flex-end !important;
+      margin: 0;
+      padding: 0;
+      min-height: 0;
+    }
+
+    > a {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: flex-end;
+      line-height: 1;
+    }
+
+    .contact {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: flex-end;
+      justify-content: center;
+      column-gap: 1.5rem;
+      min-width: 0;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        display: inline-flex;
+        align-items: flex-end;
+        margin: 0 !important;
+        padding: 0;
+        line-height: 1;
+
+        + li {
+          margin-top: 0 !important;
+        }
+
+        :global(a) {
+          display: inline-flex;
+          align-items: flex-end;
+          line-height: 1;
+        }
+
+        :global(.decorate)::before {
+          bottom: 0;
+        }
+      }
+    }
+
+    > .column:last-child {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        display: inline-flex;
+        align-items: flex-end;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+      }
+    }
+
+    .column {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(3) {
+        align-self: flex-end !important;
+      }
+    }
+  }
+
   .contact {
     a {
       white-space: nowrap;
@@ -69,6 +159,11 @@
       &:nth-child(1) {
         display: flex;
         align-self: start;
+
+        @include ultrawide {
+          align-self: flex-end !important;
+        }
+
         grid-column: span 2;
       }
       &:nth-child(2) {

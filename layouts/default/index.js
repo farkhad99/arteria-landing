@@ -1,9 +1,12 @@
-import { Cursor, CustomHead, Scrollbar } from '@studio-freight/compono'
+import { Cursor, CustomHead } from '@studio-freight/compono'
 import { useDebug } from '@darkroom.engineering/hamo'
 import cn from 'clsx'
 import { Footer } from 'components/footer'
 import { Header } from 'components/header'
+import { useIsMobile } from 'lib/breakpoint'
+import { useStore } from 'lib/store'
 import dynamic from 'next/dynamic'
+import { useEffect } from 'react'
 import s from './layout.module.scss'
 
 const Orchestra = dynamic(
@@ -122,6 +125,13 @@ export function Layout({
   contactData,
 }) {
   const debug = useDebug()
+  const isMobile = useIsMobile()
+  const setOverflow = useStore((state) => state.setOverflow)
+
+  useEffect(() => {
+    setOverflow(isMobile)
+    return () => setOverflow(false)
+  }, [isMobile, setOverflow])
 
   return (
     <>
@@ -129,7 +139,6 @@ export function Layout({
 
       <div className={cn(`theme-${theme}`, s.layout, className)}>
         <Cursor />
-        <Scrollbar />
         <Header principles={principles} contact={contactData} />
         <main className={s.main}>{children}</main>
         <Footer studioInfo={studioInfo} />

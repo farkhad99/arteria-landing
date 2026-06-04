@@ -13,6 +13,10 @@
   @include desktop {
     font-size: font-ui-px(72);
     line-height: 1;
+
+    @include tablet {
+      font-size: font-desktop-vh(56px);
+    }
   }
 }
 
