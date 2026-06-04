@@ -130,12 +130,18 @@ jobs:
             docker_env+=(-e NEXT_PUBLIC_GOOGLE_ANALYTICS)
           fi
 
-          docker build \
-            --build-arg AWS_S3_BUCKET="$AWS_S3_BUCKET" \
-            --build-arg AWS_REGION="$AWS_REGION" \
-            -t arteria-landing:latest .
+          build_args=(
+            --build-arg "AWS_S3_BUCKET=$AWS_S3_BUCKET"
+            --build-arg "AWS_REGION=$AWS_REGION"
+          )
+
+          # Builder has full node_modules — required for Prisma CLI (WASM, engines).
+          docker build "${build_args[@]}" --target builder -t arteria-landing-builder:latest .
+          docker build "${build_args[@]}" -t arteria-landing:latest .
+
           docker rm -f arteria-landing >/dev/null 2>&1 || true
-          docker run --rm "${docker_env[@]}" arteria-landing:latest npm run prisma:migrate:deploy
+          docker run --rm "${docker_env[@]}" arteria-landing-builder:latest \
+            npx prisma migrate deploy
           docker run -d --name arteria-landing --restart unless-stopped \
             "${docker_env[@]}" \
             -p 3000:3000 arteria-landing:latest

@@ -126,6 +126,7 @@ Then in GitHub: **Actions → CI and Deploy → Re-run failed jobs**.
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |
 | `no space left on device` during Docker build | EC2 root volume full — see [Disk space](#disk-space-docker-build-fails) below |
+| `prisma_schema_build_bg.wasm` / `prisma: not found` on migrate | Migrations run in the **builder** image (`arteria-landing-builder`), not the slim runtime image — redeploy with latest workflow |
 | Re-register runner | New token from GitHub → `./config.sh` again with `--replace` on EC2 |
 
 ### Disk space (Docker build fails)
