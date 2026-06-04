@@ -98,6 +98,14 @@ jobs:
               ;;
           esac
 
+      - name: Free disk space before Docker build
+        run: |
+          set -euxo pipefail
+          df -h /
+          docker system prune -af --filter "until=24h" || true
+          docker builder prune -af || true
+          df -h /
+
       - name: Build, migrate, and restart app
         run: |
           set -euo pipefail
@@ -122,7 +130,7 @@ jobs:
             docker_env+=(-e NEXT_PUBLIC_GOOGLE_ANALYTICS)
           fi
 
-          docker build --no-cache \
+          docker build \
             --build-arg AWS_S3_BUCKET="$AWS_S3_BUCKET" \
             --build-arg AWS_REGION="$AWS_REGION" \
             -t arteria-landing:latest .

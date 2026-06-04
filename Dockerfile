@@ -10,25 +10,29 @@ ARG AWS_S3_BUCKET=arteria-uploads
 ARG AWS_REGION=eu-north-1
 ENV AWS_S3_BUCKET=$AWS_S3_BUCKET
 ENV AWS_REGION=$AWS_REGION
-# Production uses /_next/image for S3 (see lib/s3-image-settings.js). Override only if optimizer 400s:
-# ENV NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 RUN npm run build
 RUN node scripts/verify-image-config.js
 
+# Production image: Next standalone trace (no full node_modules copy)
 FROM node:20-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-# sharp must match Alpine (musl); rebuild after copying node_modules
-RUN npm rebuild sharp
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
+# Prisma CLI + engines for `npx prisma migrate deploy` in CI
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

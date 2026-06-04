@@ -125,7 +125,27 @@ Then in GitHub: **Actions → CI and Deploy → Re-run failed jobs**.
 | `permission denied` on Docker | `sudo usermod -aG docker ubuntu`, re-login, restart runner service |
 | `Missing required secret/env` | Add the named secret in GitHub repo settings (see github-secrets.md) |
 | Build fails on DB | Ensure `DATABASE_URL` is reachable from EC2 (RDS security group allows EC2 SG on port 5432) |
+| `no space left on device` during Docker build | EC2 root volume full — see [Disk space](#disk-space-docker-build-fails) below |
 | Re-register runner | New token from GitHub → `./config.sh` again with `--replace` on EC2 |
+
+### Disk space (Docker build fails)
+
+Each deploy builds images on the server. Small EC2 volumes (8–20 GB) fill up with old layers and build cache.
+
+**One-time cleanup on EC2 (SSH):**
+
+```bash
+df -h /
+docker system prune -af
+docker builder prune -af
+df -h /
+```
+
+If still tight, remove unused images only: `docker images` then `docker rmi <old-image-id>`.
+
+**Longer term:** use a **30 GB+** root volume, or attach a larger EBS volume. The repo now uses a **standalone** Docker image (smaller than copying full `node_modules`) and the workflow prunes Docker before each build.
+
+**Do not** add `docker build --no-cache` unless debugging — it doubles disk use every deploy.
 
 ## Optional: Nginx + HTTPS
 

@@ -11,6 +11,7 @@ const s3RemotePatterns = getS3RemotePatterns()
 // })
 
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   transpilePackages: ['@studio-freight/compono'],
   experimental: {
