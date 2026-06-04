@@ -94,16 +94,37 @@ This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was *
    You should get an image (200), not JSON with `"url" parameter is not allowed`.
 4. `npm run build` locally runs `scripts/verify-image-config.js` and fails if S3 hosts are missing from the baked allowlist.
 
-**Production default:** S3 JPEG/PNG/WebP go through **`/_next/image`** (WebP/AVIF, ~520px wide for project cards). GIFs stay direct from S3 (animation). If `/_next/image` returns 400 again, set build env `NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true` and redeploy.
+**Production default:** S3 JPEG/PNG/WebP go through **`/_next/image`** (WebP/AVIF, width capped by `sizes` — ~360px on mobile, ~400px on desktop cards). GIFs stay direct from S3 (animation). If `/_next/image` returns 400 again, set build env `NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true` and redeploy.
+
+**How resize works (you do not need S3 to resize files)**
+
+1. Browser reads `sizes` on `<Image>` (e.g. mobile card ≈ `360px` wide).
+2. Browser requests `https://your-site.com/_next/image?url=…s3…&w=384&q=70` (nearest width from srcset).
+3. Next.js on EC2 fetches the **original once** from S3, resizes with **sharp**, returns WebP/AVIF, caches on disk.
+4. Height follows the **aspect ratio** from `width` / `height` on the component (not a separate S3 resize).
 
 **Fast delivery checklist**
 
-- Project cards: `sizes` capped ~280–520px, quality 68, first asset `priority` + `fetchPriority="high"`.
-- Gallery images load only when the gallery is opened.
-- MP4/WebM: lazy until near viewport (`OptimizedVideo`); compress uploads (H.264, ≤1080p).
-- Optional dev test: `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` in `.env.local`.
+- Confirm Network tab shows `/_next/image?w=…` (not multi‑MB direct S3 URLs).
+- Project cards: mobile `sizes` cap ~360–400px; first asset `priority`.
+- Gallery loads only when opened.
+- MP4/WebM: lazy until near viewport; compress uploads (H.264, ≤1080p).
+- Dev test: `NEXT_PUBLIC_S3_IMAGE_OPTIMIZER=true` in `.env.local`.
 
-Compare build IDs: local `cat .next/BUILD_ID` vs view page source on production (`buildId` in `__NEXT_DATA__`). If they differ, production has not picked up the latest deploy.
+#### S3 CDN (CloudFront) — do you need it?
+
+| Setup | What it speeds up | Resizes images? |
+|--------|-------------------|-----------------|
+| **S3 only** | Storage + origin for originals | No |
+| **CloudFront → S3** | Faster delivery of **full-size** originals worldwide | No (unless you add a separate image service) |
+| **`/_next/image` on your site** (current) | Smaller WebP/AVIF per device width | **Yes** — this is your resize/compress layer |
+| **CloudFront → your domain** (`sergeayupov.com`) | Caches HTML + cached `/_next/image` responses at the edge | Indirectly (reuses already-optimized URLs) |
+
+**Recommendation:** Keep S3 as the **origin for originals**. Rely on **Next.js image optimization** for width/quality. Optionally add **CloudFront in front of your website** (not only the bucket) so repeat visitors get optimized images from an edge cache — you do **not** need a separate “image CDN” on the bucket if `/_next/image` works.
+
+**Do not** set `NEXT_PUBLIC_S3_IMAGE_UNOPTIMIZED=true` unless the optimizer is broken — that forces full-resolution S3 downloads on every device.
+
+Compare build IDs: local `cat .next/BUILD_ID` vs production page source (`buildId` in `__NEXT_DATA__`) after deploy.
 - **S3 videos:** `<video src="https://…s3…">` (no `next/video` in Next 14). Compress MP4/WebM before upload for best performance; optional poster images are not generated automatically yet.
 - **GIFs:** uploaded as `image/gif` and shown with **next/image** (same as JPEG/PNG). They are **not** treated as video. Animated GIFs must stay **unoptimized** (Next.js would strip animation if resized to WebP/AVIF).
 - **Legacy non-S3 images** (e.g. Contentful): still use `/_next/image` optimization where configured.

@@ -46,8 +46,9 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 30,
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [256, 320, 384, 480, 512, 640, 750, 828],
+    // Mobile-first widths — srcset picks nearest `w` to `sizes` hint
+    deviceSizes: [375, 390, 430, 640, 750, 828, 1080, 1200],
+    imageSizes: [256, 320, 360, 384, 400, 480, 512, 640],
   },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
