@@ -13,10 +13,18 @@
     aspect-ratio: 375 / 350;
     width: 100%;
     height: mobile-vw(350px);
+    overflow: hidden;
 
     @include desktop {
       display: none;
     }
+  }
+
+  .heroVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 

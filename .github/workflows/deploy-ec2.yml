@@ -151,12 +151,17 @@ jobs:
           # Public project images must load (direct S3 or /_next/image)
           sample_url="https://${AWS_S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/projects/smoke-test.jpg"
           encoded_url="$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$sample_url''', safe=''))")"
-          img_code="$(curl -s -o /dev/null -w '%{http_code}' \
-            "http://127.0.0.1:3000/_next/image?url=${encoded_url}&w=640&q=75" || echo 000)"
-          if [[ "$img_code" == "200" ]]; then
-            echo "Image optimizer allowlist OK (/_next/image → 200)"
+          img_url="http://127.0.0.1:3000/_next/image?url=${encoded_url}&w=360&q=68"
+          img_code="$(curl -s -o /tmp/arteria-img-opt.bin -w '%{http_code}' \
+            -H 'Accept: image/webp' "$img_url" || echo 000)"
+          img_bytes="$(wc -c < /tmp/arteria-img-opt.bin 2>/dev/null | tr -d ' ')"
+          img_type="$(file -b --mime-type /tmp/arteria-img-opt.bin 2>/dev/null || echo unknown)"
+          if [[ "$img_code" == "200" && "$img_bytes" -lt 800000 ]]; then
+            echo "Image optimizer OK (HTTP 200, ${img_bytes} bytes, ${img_type})"
+          elif [[ "$img_code" == "200" ]]; then
+            echo "::warning::/_next/image returned 200 but response looks unoptimized (${img_bytes} bytes, ${img_type}) — check sharp in Docker image"
           else
-            echo "::warning::/_next/image returned HTTP $img_code for S3 URL (site uses direct S3 img when unoptimized)"
+            echo "::warning::/_next/image returned HTTP $img_code for S3 URL"
           fi
 
           echo "Deploy complete — app is listening on port 3000"

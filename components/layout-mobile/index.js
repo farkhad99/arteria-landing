@@ -1,16 +1,18 @@
 import { Image } from '@studio-freight/compono'
 import cn from 'clsx'
+import { OptimizedVideo } from 'components/optimized-video'
 import { ProjectAccordion } from 'components/project-accordion'
 import s from './layout-mobile.module.scss'
 
 const LayoutMobile = ({ projects }) => {
   return (
     <div className={s.content}>
-      <section className={s['hero-image']}>
-        <Image
-          src="/mobile-temp-images/tetsuo.jpg"
-          alt="tetsuo placeholder face"
-          fill
+      <section className={s['hero-image']} aria-hidden>
+        <OptimizedVideo
+          className={s.heroVideo}
+          src="/mobile-temp-images/main-mobile-loop.mp4"
+          poster="/mobile-temp-images/tetsuo.jpg"
+          priority
         />
       </section>
       <section className={cn(s.projects, 'layout-block')}>

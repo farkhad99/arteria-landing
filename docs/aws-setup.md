@@ -101,6 +101,8 @@ This is **not** S3 CORS. Next.js blocks the optimizer when the S3 hostname was *
 1. Browser reads `sizes` on `<Image>` (e.g. mobile card ≈ `360px` wide).
 2. Browser requests `https://your-site.com/_next/image?url=…s3…&w=384&q=70` (nearest width from srcset).
 3. Next.js on EC2 fetches the **original once** from S3, resizes with **sharp**, returns WebP/AVIF, caches on disk.
+
+**If `/_next/image?w=360` returns HTTP 200 but a multi‑MB full‑resolution PNG:** Sharp is missing from the **standalone** Docker image (Next falls back to the original). Fix: `outputFileTracingIncludes` for `sharp` + `@img` in `next.config.js`, and copy `node_modules/sharp` + `node_modules/@img` in `Dockerfile` (already in this repo). Redeploy after changing either file.
 4. Height follows the **aspect ratio** from `width` / `height` on the component (not a separate S3 resize).
 
 **Fast delivery checklist**
