@@ -27,6 +27,11 @@
     display: flex;
     padding-bottom: desktop-vh(24px);
   }
+
+  .description {
+    font-family: var(--font-secondary);
+    text-transform: none;
+  }
 }
 
 .projects {

@@ -13,7 +13,11 @@
   --header-height: #{mobile-vw(58px)};
 
   @include desktop {
-    --header-height: #{desktop-vw(98px)};
+    --header-height: #{desktop-vw-capped(98px)};
+  }
+
+  @include wide-short-viewport {
+    --header-height: 118px;
   }
 }
 

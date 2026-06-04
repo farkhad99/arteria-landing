@@ -8,8 +8,13 @@
     padding-bottom: mobile-vw(24px);
 
     @include desktop {
-      padding-top: desktop-vw(16px);
-      padding-bottom: desktop-vw(8px);
+      padding-top: desktop-vw-capped(16px);
+      padding-bottom: desktop-vw-capped(8px);
+    }
+
+    @include wide-short-viewport {
+      padding-top: 12px;
+      padding-bottom: 6px;
     }
 
     .eggs {
@@ -27,6 +32,10 @@
 
         @include desktop {
           width: desktop-vw(24px);
+
+          @media (min-width: 2560px) {
+            width: desktop-vw-capped(22px);
+          }
         }
 
         + .egg {
@@ -52,6 +61,13 @@
 
       @include desktop {
         grid-column: 8/-1;
+
+        @include ultrawide-chrome-font;
+
+        @media (min-width: 2560px) {
+          padding: desktop-vw-capped(4px) desktop-vw-capped(8px);
+          border-radius: desktop-vw-capped(8px);
+        }
       }
     }
   }
@@ -67,6 +83,8 @@
       @include desktop {
         transition: filter 300ms ease-in-out;
         filter: blur(1.5px);
+
+        @include ultrawide-chrome-font;
       }
 
       @include hover {
@@ -79,6 +97,10 @@
         margin: 0 mobile-vw(16px);
         @include desktop {
           margin: 0 desktop-vw(16px);
+
+          @media (min-width: 2560px) {
+            margin: 0 desktop-vw-capped(12px);
+          }
         }
       }
     }
@@ -99,6 +121,10 @@
 
       @include desktop {
         margin: 12px 0 8px;
+      }
+
+      @include wide-short-viewport {
+        margin: 8px 0 4px;
       }
     }
   }

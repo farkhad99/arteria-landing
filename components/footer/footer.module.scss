@@ -40,12 +40,28 @@
   }
 
   @include desktop {
-    padding: desktop-vw(16px) 0 desktop-vw(24px) 0;
+    padding: desktop-vw-capped(16px) 0 desktop-vw-capped(24px) 0;
+
+    :global(.p-s) {
+      @include ultrawide-chrome-font;
+    }
+  }
+
+  @include wide-short-viewport {
+    padding: 10px 0 12px;
   }
 
   .contact {
     a {
       white-space: nowrap;
+    }
+
+    @include desktop {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      column-gap: 2em;
     }
   }
 
@@ -59,10 +75,10 @@
         grid-column: span 2;
       }
       &:nth-child(2) {
-        grid-column: span 3;
+        grid-column: span 4;
       }
       &:nth-child(3) {
-        grid-column: span 3;
+        grid-column: span 2;
         text-align: end;
       }
       &:nth-child(4) {
@@ -88,6 +104,12 @@
 
       @include desktop {
         margin-top: desktop-vw(4px);
+      }
+    }
+
+    &.contact li + li {
+      @include desktop {
+        margin-top: 0;
       }
     }
   }

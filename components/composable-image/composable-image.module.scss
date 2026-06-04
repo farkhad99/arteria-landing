@@ -46,13 +46,23 @@
       height: mobile-vw(238px);
 
       @include desktop {
-        height: desktop-vw(403px);
+        height: desktop-vh-capped(403px);
+      }
+
+      @include wide-short-viewport {
+        height: auto;
+        max-height: 50vh;
       }
     }
 
     &.large:not(:only-child) {
       @include desktop {
-        height: desktop-vw(611px);
+        height: desktop-vh-capped(611px);
+      }
+
+      @include wide-short-viewport {
+        height: auto;
+        max-height: 62vh;
       }
     }
     &.small {

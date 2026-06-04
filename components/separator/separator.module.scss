@@ -12,8 +12,8 @@
     height: mobile-vw(12px);
 
     @include desktop {
-      width: desktop-vw(12px);
-      height: desktop-vw(12px);
+      width: desktop-vw-capped(12px);
+      height: desktop-vw-capped(12px);
     }
 
     &:before,

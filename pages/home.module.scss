@@ -1,7 +1,11 @@
 .content {
   align-items: start;
   height: 100%;
-  padding: desktop-vw(18px) 0 desktop-vw(24px) 0;
+  padding: desktop-vw-capped(18px) 0 desktop-vw-capped(24px) 0;
+
+  @include wide-short-viewport {
+    padding: 12px 0 14px;
+  }
 }
 
 .about {
@@ -9,7 +13,13 @@
 
   .title {
     display: flex;
-    padding-bottom: desktop-vh(24px);
+    padding-bottom: desktop-vh-capped(24px);
+  }
+
+  /* Same `p-s` as footer — scales with viewport width, not capped */
+  .description {
+    font-family: var(--font-secondary);
+    text-transform: none;
   }
 }
 
@@ -18,7 +28,7 @@
 
   .title {
     display: flex;
-    padding-bottom: desktop-vh(24px);
+    padding-bottom: desktop-vh-capped(24px);
   }
 
   .list {
@@ -77,7 +87,7 @@
   grid-column: span 4;
 
   .title {
-    padding-bottom: desktop-vh(24px);
+    padding-bottom: desktop-vh-capped(24px);
   }
 
   .heading {
@@ -219,7 +229,11 @@
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: desktop-vh(40px);
+    height: desktop-vh-capped(32px);
+
+    @include wide-short-viewport {
+      height: 24px;
+    }
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0) 0%,

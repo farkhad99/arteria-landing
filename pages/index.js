@@ -82,7 +82,7 @@ export default function Home({ arteriaStudio, contact, projects }) {
               >
                 About
               </p>
-              <ScrollableBox className={s.description}>
+              <ScrollableBox className={cn(s.description, 'p-s')}>
                 {/* {renderer(arteriaStudio.about)} */}
                 ArteriaStudios is a subscription-based creative studio
                 empowering brands and startups with design solutions that scale,

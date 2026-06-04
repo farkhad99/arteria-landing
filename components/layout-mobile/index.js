@@ -27,7 +27,7 @@ const LayoutMobile = ({ projects }) => {
         <p className={cn(s.title, 'p text-bold text-uppercase text-muted')}>
           About
         </p>
-        <div className={s.description}>
+        <div className={cn(s.description, 'p-s')}>
           ArteriaStudios is a subscription-based creative studio empowering
           brands and startups with design solutions that scale, adapt, and
           inspire. We’re more than just designers—we’re your partners in
