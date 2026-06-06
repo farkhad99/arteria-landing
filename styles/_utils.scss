@@ -70,10 +70,10 @@ html.has-scroll-smooth {
     padding: desktop-vw(4px) desktop-vw(8px);
     border-radius: desktop-vw(8px);
 
-    @include tablet {
-      font-size: font-desktop-vh(14px);
-      padding: desktop-vh-capped(4px) desktop-vh-capped(8px);
-      border-radius: desktop-vh-capped(8px);
+    @include wide-type {
+      font-size: font-desktop-vw(16px);
+      padding: desktop-vw(4px) desktop-vw(8px);
+      border-radius: desktop-vw(8px);
     }
   }
 

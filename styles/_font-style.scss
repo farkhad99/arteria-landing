@@ -13,12 +13,12 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
 
+  @include wide-type {
+    font-size: font-desktop-vw(178px);
+  }
+
   @include desktop {
     font-size: font-desktop-vw(178px);
-
-    @include tablet {
-      font-size: font-desktop-vh(120px);
-    }
   }
 }
 
@@ -29,13 +29,9 @@
   line-height: 125%;
   letter-spacing: 0.01em;
 
-  @include desktop {
+  @include wide-type {
     line-height: 140%;
     font-size: font-desktop-vw(16px);
-
-    @include tablet {
-      font-size: font-desktop-vh(16px);
-    }
   }
 }
 
@@ -47,12 +43,8 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
 
-  @include desktop {
+  @include wide-type {
     font-size: font-desktop-vw(12px);
-
-    @include tablet {
-      font-size: font-desktop-vh(12px);
-    }
   }
 }
 
@@ -62,12 +54,8 @@
   font-weight: 400;
   line-height: 125%;
 
-  @include desktop {
+  @include wide-type {
     font-size: font-desktop-vw(12px);
-
-    @include tablet {
-      font-size: font-desktop-vh(12px);
-    }
   }
 }
 

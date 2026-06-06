@@ -24,6 +24,13 @@
       width: 100%;
       user-select: none;
 
+      > p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
       .category {
         display: flex;
         align-items: center;

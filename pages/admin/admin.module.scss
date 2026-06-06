@@ -31,6 +31,21 @@
   padding: 20px;
 }
 
+.cardPanel {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 180px);
+  min-height: 0;
+}
+
+.cardScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .sectionHead {
   display: flex;
   align-items: center;
@@ -148,6 +163,7 @@
 
 .tableWrap {
   overflow-x: auto;
+  overflow-y: auto;
 }
 
 .table {

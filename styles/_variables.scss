@@ -1,7 +1,10 @@
 /* Breakpoints */
-$mobile-breakpoint: 800px;
-/** Desktop layout on narrow/tall viewports (iPad etc.) — use vh-based type */
-$tablet-max-width: 1366px;
+/** Phone-only tweaks (true small screens) */
+$phone-breakpoint: 800px;
+/** Mobile layout + tablet (matches JS `MOBILE_BREAKPOINT_PX`) */
+$tablet-layout-max: 1366px;
+$desktop-layout-min: 1367px;
+
 $ultra-wide-breakpoint: 3000px;
 $ultrawide-min-width: 2560px;
 /** Multiply all `font-*` helpers on viewports >= $ultrawide-min-width (0.6 = 40% smaller) */

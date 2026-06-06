@@ -276,27 +276,29 @@ export default function AdminPage({ authenticated }) {
         {status && !drawerOpen && <p className={s.statusBanner}>{status}</p>}
 
         {activeTab === 'projects' && (
-          <section className={s.card}>
+          <section className={cn(s.card, s.cardPanel)}>
             <div className={s.sectionHead}>
               <h2>Projects</h2>
               <button className={cn(s.button, s.buttonAccent)} type="button" onClick={openCreateDrawer}>
                 Add project
               </button>
             </div>
-            <ProjectSortList
-              projects={projects}
-              onProjectsChange={setProjects}
-              onEdit={startEdit}
-              onDelete={deleteProject}
-              onStatus={setStatus}
-            />
+            <div className={s.cardScroll}>
+              <ProjectSortList
+                projects={projects}
+                onProjectsChange={setProjects}
+                onEdit={startEdit}
+                onDelete={deleteProject}
+                onStatus={setStatus}
+              />
+            </div>
           </section>
         )}
 
         {activeTab === 'contacts' && (
-          <section className={s.card}>
+          <section className={cn(s.card, s.cardPanel)}>
             <h2>Contact requests</h2>
-            <div className={s.tableWrap}>
+            <div className={cn(s.tableWrap, s.cardScroll)}>
               <table className={s.table}>
                 <thead>
                   <tr>

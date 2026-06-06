@@ -53,6 +53,12 @@ body {
     max-height: 100dvh;
     overflow: hidden;
   }
+
+  &.allow-scroll {
+    height: auto;
+    max-height: none;
+    overflow: auto;
+  }
 }
 
 // custom cursor

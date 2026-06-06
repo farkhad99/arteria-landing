@@ -1,22 +1,37 @@
 @use 'sass:math';
 @import './_variables.scss';
 
-// Breakpoint
+// Breakpoints — layout vs type
+@mixin phone {
+  @media (max-width: #{$phone-breakpoint}) {
+    @content;
+  }
+}
+
+/** Mobile layout (phones + tablets), matches `useIsMobile()` */
 @mixin mobile {
-  @media (max-width: #{$mobile-breakpoint}) {
+  @media (max-width: #{$tablet-layout-max}) {
     @content;
   }
 }
 
+/** Desktop grid layout (home columns, locked viewport) */
 @mixin desktop {
-  @media (min-width: #{$mobile-breakpoint + 1}) {
+  @media (min-width: #{$desktop-layout-min}) {
     @content;
   }
 }
 
-/** iPad / tablet: desktop grid, fonts scale with viewport height */
+/** Tablet width band: mobile layout, wide-screen typography */
 @mixin tablet {
-  @media (min-width: #{$mobile-breakpoint + 1}) and (max-width: #{$tablet-max-width}) {
+  @media (min-width: #{$phone-breakpoint + 1}) and (max-width: #{$tablet-layout-max}) {
+    @content;
+  }
+}
+
+/** Wide-screen font scale (tablets + desktop), not phone */
+@mixin wide-type {
+  @media (min-width: #{$phone-breakpoint + 1}) {
     @content;
   }
 }

@@ -7,6 +7,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useStore } from 'lib/store'
 // import { ProjectProvider, RafDriverProvider } from 'lib/theatre'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import 'styles/global.scss'
 
@@ -39,19 +40,28 @@ if (typeof window !== 'undefined') {
 }
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter()
   const overflow = useStore(({ overflow }) => overflow)
   const lenis = useLenis(ScrollTrigger.update)
   useEffect(ScrollTrigger.refresh, [lenis])
 
   useEffect(() => {
-    if (overflow) {
+    const isScrollableRoute = router.pathname.startsWith('/admin')
+
+    document.body.classList.toggle('allow-scroll', isScrollableRoute)
+
+    if (isScrollableRoute || overflow) {
       lenis?.start()
       document.documentElement.style.removeProperty('overflow')
     } else {
       lenis?.stop()
       document.documentElement.style.setProperty('overflow', 'hidden')
     }
-  }, [lenis, overflow])
+
+    return () => {
+      document.body.classList.remove('allow-scroll')
+    }
+  }, [lenis, overflow, router.pathname])
 
   return (
     <>
