@@ -34,8 +34,10 @@
   border-radius: 999px;
   color: var(--theme-secondary);
   text-transform: uppercase;
-  transition: color 300ms var(--ease-out-expo),
-    border-color 300ms var(--ease-out-expo);
+  transition:
+    color 300ms var(--ease-out-expo),
+    border-color 300ms var(--ease-out-expo),
+    background-color 300ms var(--ease-out-expo);
   cursor: default;
   user-select: none;
 
@@ -45,7 +47,8 @@
 
   @include hover {
     &:hover {
-      color: var(--green);
+      color: var(--theme-secondary);
+      background-color: var(--green);
       border-color: var(--green);
     }
   }
