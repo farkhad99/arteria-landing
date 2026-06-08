@@ -219,7 +219,11 @@
   margin-top: mobile-vw(50px);
 }
 
-.about,
+.about {
+  display: block;
+  height: auto;
+}
+
 .projects,
 .project-details {
   display: flex;

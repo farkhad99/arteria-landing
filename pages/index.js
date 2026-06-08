@@ -9,7 +9,7 @@ import {
 import { ClientOnly } from 'components/isomorphic'
 import { LayoutMobile } from 'components/layout-mobile'
 import { ScrollableBox } from 'components/scrollable-box'
-import { ServiceTags } from 'components/service-tags'
+import { ServicesBlock } from 'components/service-tags'
 import { Layout } from 'layouts/default'
 import { prisma } from 'lib/prisma'
 import { renderProjectBody } from 'lib/render-project-body'
@@ -87,24 +87,26 @@ export default function Home({ arteriaStudio, contact, projects, services }) {
               >
                 About
               </p>
-              <ScrollableBox className={cn(s.description, 'p-s')}>
-                {/* {renderer(arteriaStudio.about)} */}
-                ArteriaStudios is a subscription-based creative studio
-                empowering brands and startups with design solutions that scale,
-                adapt, and inspire. We’re more than just designers—we’re your
-                partners in building brands, crafting websites, and launching
-                ideas that leave a lasting impression. Our clients come from
-                diverse industries but share a common drive: to stand out,
-                connect authentically, and create meaningful impact. At Arteria,
-                we to exceed them with every project, delivering creative
-                solutions that elevate businesses to new heights. Whether you're
-                a startup finding your footing or an established brand seeking a
-                fresh perspective, ArteriaStudios is here to guide your journey
-                with innovative design, strategic thinking, and a relentless
-                commitment to your success. Let's create something extraordinary
-                together.
+              <ScrollableBox className={s.aboutScroll}>
+                <div className={cn(s.description, 'p-s')}>
+                  {/* {renderer(arteriaStudio.about)} */}
+                  ArteriaStudios is a subscription-based creative studio
+                  empowering brands and startups with design solutions that scale,
+                  adapt, and inspire. We’re more than just designers—we’re your
+                  partners in building brands, crafting websites, and launching
+                  ideas that leave a lasting impression. Our clients come from
+                  diverse industries but share a common drive: to stand out,
+                  connect authentically, and create meaningful impact. At Arteria,
+                  we to exceed them with every project, delivering creative
+                  solutions that elevate businesses to new heights. Whether you're
+                  a startup finding your footing or an established brand seeking a
+                  fresh perspective, ArteriaStudios is here to guide your journey
+                  with innovative design, strategic thinking, and a relentless
+                  commitment to your success. Let's create something extraordinary
+                  together.
+                </div>
+                <ServicesBlock items={services} titleClassName={s.title} />
               </ScrollableBox>
-              <ServiceTags items={services} className={s.services} />
             </section>
             <section className={s.projects}>
               <p

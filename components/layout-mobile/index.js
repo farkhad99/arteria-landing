@@ -2,7 +2,7 @@ import { Image } from '@studio-freight/compono'
 import cn from 'clsx'
 import { OptimizedVideo } from 'components/optimized-video'
 import { ProjectAccordion } from 'components/project-accordion'
-import { ServiceTags } from 'components/service-tags'
+import { ServicesBlock } from 'components/service-tags'
 import s from './layout-mobile.module.scss'
 
 const LayoutMobile = ({ projects, services = [] }) => {
@@ -45,7 +45,7 @@ const LayoutMobile = ({ projects, services = [] }) => {
           commitment to your success. Let's create something extraordinary
           together.
         </div>
-        <ServiceTags items={services} />
+        <ServicesBlock items={services} titleClassName={s.title} />
       </section>
     </div>
   )

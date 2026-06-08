@@ -1,15 +1,28 @@
+.block {
+  flex-shrink: 0;
+}
+
+.title {
+  display: flex;
+  padding-top: mobile-vw(24px);
+  padding-bottom: mobile-vw(16px);
+
+  @include wide-type {
+    padding-top: desktop-vw(24px);
+    padding-bottom: desktop-vw(16px);
+  }
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: mobile-vw(8px);
   list-style: none;
   margin: 0;
-  padding: mobile-vw(16px) 0 0;
-  flex-shrink: 0;
+  padding: 0;
 
   @include wide-type {
     gap: desktop-vw(8px);
-    padding-top: desktop-vw(16px);
   }
 }
 

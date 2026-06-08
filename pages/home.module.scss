@@ -18,16 +18,15 @@
     padding-bottom: desktop-vh-capped(24px);
   }
 
-  /* Same `p-s` as footer — scales with viewport width, not capped */
-  .description {
-    font-family: var(--font-secondary);
-    text-transform: none;
+  .aboutScroll {
     flex: 1 1 0;
     min-height: 0;
   }
 
-  .services {
-    flex-shrink: 0;
+  /* Same `p-s` as footer — scales with viewport width, not capped */
+  .description {
+    font-family: var(--font-secondary);
+    text-transform: none;
   }
 }
 

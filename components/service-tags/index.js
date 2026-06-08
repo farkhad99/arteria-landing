@@ -14,3 +14,22 @@ export function ServiceTags({ items = [], className }) {
     </ul>
   )
 }
+
+export function ServicesBlock({ items = [], titleClassName, className }) {
+  if (!items?.length) return null
+
+  return (
+    <div className={cn(s.block, className)}>
+      <p
+        className={cn(
+          titleClassName,
+          s.title,
+          'p text-bold text-uppercase text-muted',
+        )}
+      >
+        Services
+      </p>
+      <ServiceTags items={items} />
+    </div>
+  )
+}
