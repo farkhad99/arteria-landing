@@ -1,0 +1,39 @@
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: mobile-vw(8px);
+  list-style: none;
+  margin: 0;
+  padding: mobile-vw(16px) 0 0;
+  flex-shrink: 0;
+
+  @include wide-type {
+    gap: desktop-vw(8px);
+    padding-top: desktop-vw(16px);
+  }
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: mobile-vw(6px) mobile-vw(12px);
+  border: 1px solid var(--grey);
+  border-radius: 999px;
+  color: var(--theme-secondary);
+  text-transform: uppercase;
+  transition: color 300ms var(--ease-out-expo),
+    border-color 300ms var(--ease-out-expo);
+  cursor: default;
+  user-select: none;
+
+  @include wide-type {
+    padding: desktop-vw(6px) desktop-vw(14px);
+  }
+
+  @include hover {
+    &:hover {
+      color: var(--green);
+      border-color: var(--green);
+    }
+  }
+}

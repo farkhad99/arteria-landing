@@ -46,6 +46,18 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.serviceAdd {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  .input {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
 .sectionHead {
   display: flex;
   align-items: center;

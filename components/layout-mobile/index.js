@@ -2,9 +2,10 @@ import { Image } from '@studio-freight/compono'
 import cn from 'clsx'
 import { OptimizedVideo } from 'components/optimized-video'
 import { ProjectAccordion } from 'components/project-accordion'
+import { ServiceTags } from 'components/service-tags'
 import s from './layout-mobile.module.scss'
 
-const LayoutMobile = ({ projects }) => {
+const LayoutMobile = ({ projects, services = [] }) => {
   return (
     <div className={s.content}>
       <section className={s['hero-image']} aria-hidden>
@@ -44,6 +45,7 @@ const LayoutMobile = ({ projects }) => {
           commitment to your success. Let's create something extraordinary
           together.
         </div>
+        <ServiceTags items={services} />
       </section>
     </div>
   )

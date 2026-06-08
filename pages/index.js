@@ -9,6 +9,7 @@ import {
 import { ClientOnly } from 'components/isomorphic'
 import { LayoutMobile } from 'components/layout-mobile'
 import { ScrollableBox } from 'components/scrollable-box'
+import { ServiceTags } from 'components/service-tags'
 import { Layout } from 'layouts/default'
 import { prisma } from 'lib/prisma'
 import { renderProjectBody } from 'lib/render-project-body'
@@ -28,7 +29,7 @@ const Gallery = dynamic(
   },
 )
 
-export default function Home({ arteriaStudio, contact, projects }) {
+export default function Home({ arteriaStudio, contact, projects, services }) {
   const router = useRouter()
 
   const [showInfoModal, setShowInfoModal] = useState(false)
@@ -72,7 +73,11 @@ export default function Home({ arteriaStudio, contact, projects }) {
       contactData={contact}
     >
       {!isDesktop ? (
-        <LayoutMobile studioFreight={arteriaStudio} projects={projects} />
+        <LayoutMobile
+          studioFreight={arteriaStudio}
+          projects={projects}
+          services={services}
+        />
       ) : (
         <ClientOnly>
           <div className={cn(s.content, 'layout-grid')}>
@@ -99,6 +104,7 @@ export default function Home({ arteriaStudio, contact, projects }) {
                 commitment to your success. Let's create something extraordinary
                 together.
               </ScrollableBox>
+              <ServiceTags items={services} className={s.services} />
             </section>
             <section className={s.projects}>
               <p
@@ -310,10 +316,15 @@ export default function Home({ arteriaStudio, contact, projects }) {
 
 export async function getServerSideProps() {
   try {
-    const dbProjects = await prisma.project.findMany({
-      include: { media: { orderBy: { sortOrder: 'asc' } } },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-    })
+    const [dbProjects, dbServices] = await Promise.all([
+      prisma.project.findMany({
+        include: { media: { orderBy: { sortOrder: 'asc' } } },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+      }),
+      prisma.studioService.findMany({
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      }),
+    ])
 
     const items = dbProjects.map((project) => ({
       ...project,
@@ -331,6 +342,7 @@ export async function getServerSideProps() {
     return {
       props: {
         projects: { items },
+        services: dbServices,
         id: 'home',
       },
     }
@@ -339,6 +351,7 @@ export async function getServerSideProps() {
     return {
       props: {
         projects: { items: [] },
+        services: [],
         id: 'home',
       },
     }

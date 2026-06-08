@@ -1,6 +1,7 @@
 import { MediaDropzone } from 'components/admin/media-dropzone'
 import { ProjectSortList } from 'components/admin/project-sort-list'
 import { ProjectDrawer } from 'components/admin/project-drawer'
+import { ServiceSortList } from 'components/admin/service-sort-list'
 import { clearSessionCookie, isAdminAuthenticated } from 'lib/admin-auth'
 import { uploadFileToS3 } from 'lib/admin-s3-upload'
 import { parseApiResponse } from 'lib/parse-api-response'
@@ -62,6 +63,8 @@ export default function AdminPage({ authenticated }) {
   const [status, setStatus] = useState('')
   const [contacts, setContacts] = useState([])
   const [projects, setProjects] = useState([])
+  const [services, setServices] = useState([])
+  const [serviceName, setServiceName] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [activeTab, setActiveTab] = useState('projects')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -99,6 +102,7 @@ export default function AdminPage({ authenticated }) {
     resetProjectForm()
     setProjects([])
     setContacts([])
+    setServices([])
   }
 
   const fetchContacts = async () => {
@@ -117,11 +121,82 @@ export default function AdminPage({ authenticated }) {
     }
   }
 
+  const fetchServices = async () => {
+    const response = await fetch('/api/services')
+    const { data: payload } = await parseApiResponse(response)
+    if (response.ok) {
+      setServices(payload.items)
+    }
+  }
+
   useEffect(() => {
     if (!isAuthenticated) return
     fetchContacts()
     fetchProjects()
+    fetchServices()
   }, [isAuthenticated])
+
+  const addService = async (event) => {
+    event.preventDefault()
+    const trimmed = serviceName.trim()
+    if (!trimmed) return
+
+    setStatus('Adding service...')
+    const response = await fetch('/api/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed }),
+    })
+    const { data: payload } = await parseApiResponse(response)
+    if (!response.ok) {
+      setStatus(payload.error || 'Failed to add service')
+      return
+    }
+
+    setServiceName('')
+    setStatus('Service added.')
+    fetchServices()
+  }
+
+  const editService = async (service) => {
+    const nextName = window.prompt('Service name', service.name)
+    if (nextName === null) return
+
+    const trimmed = nextName.trim()
+    if (!trimmed || trimmed === service.name) return
+
+    setStatus('Updating service...')
+    const response = await fetch(`/api/services/${service.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed }),
+    })
+    const { data: payload } = await parseApiResponse(response)
+    if (!response.ok) {
+      setStatus(payload.error || 'Failed to update service')
+      return
+    }
+
+    setStatus('Service updated.')
+    fetchServices()
+  }
+
+  const deleteService = async (serviceId) => {
+    if (!window.confirm('Delete this service?')) return
+
+    setStatus('Deleting service...')
+    const response = await fetch(`/api/services/${serviceId}`, {
+      method: 'DELETE',
+    })
+    const { data: payload } = await parseApiResponse(response)
+    if (!response.ok) {
+      setStatus(payload.error || 'Failed to delete service')
+      return
+    }
+
+    setStatus('Service deleted.')
+    fetchServices()
+  }
 
   const uploadFile = useCallback((file) => uploadFileToS3(file), [])
 
@@ -245,7 +320,8 @@ export default function AdminPage({ authenticated }) {
               type="button"
               onClick={() => {
                 if (activeTab === 'projects') fetchProjects()
-                else fetchContacts()
+                else if (activeTab === 'contacts') fetchContacts()
+                else fetchServices()
               }}
             >
               Refresh
@@ -271,6 +347,13 @@ export default function AdminPage({ authenticated }) {
           >
             Contacts ({contacts.length})
           </button>
+          <button
+            type="button"
+            className={cn(s.tab, activeTab === 'services' && s.tabActive)}
+            onClick={() => setActiveTab('services')}
+          >
+            Services ({services.length})
+          </button>
         </nav>
 
         {status && !drawerOpen && <p className={s.statusBanner}>{status}</p>}
@@ -289,6 +372,39 @@ export default function AdminPage({ authenticated }) {
                 onProjectsChange={setProjects}
                 onEdit={startEdit}
                 onDelete={deleteProject}
+                onStatus={setStatus}
+              />
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'services' && (
+          <section className={cn(s.card, s.cardPanel)}>
+            <div className={s.sectionHead}>
+              <h2>Services</h2>
+            </div>
+            <form className={s.serviceAdd} onSubmit={addService}>
+              <input
+                className={s.input}
+                value={serviceName}
+                onChange={(event) => setServiceName(event.target.value)}
+                placeholder="e.g. Branding, Web design"
+                aria-label="Service name"
+              />
+              <button
+                className={cn(s.button, s.buttonAccent)}
+                type="submit"
+                disabled={!serviceName.trim()}
+              >
+                Add service
+              </button>
+            </form>
+            <div className={s.cardScroll}>
+              <ServiceSortList
+                services={services}
+                onServicesChange={setServices}
+                onEdit={editService}
+                onDelete={deleteService}
                 onStatus={setStatus}
               />
             </div>
