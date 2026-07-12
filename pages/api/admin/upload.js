@@ -1,5 +1,9 @@
 import { isAdminAuthenticated } from 'lib/admin-auth'
-import { createUploadKey, uploadObject } from 'lib/aws-s3'
+import {
+  createUploadKey,
+  mediaKindFromContentType,
+  uploadObject,
+} from 'lib/vercel-blob'
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from 'lib/upload-limits'
 
 export const config = {
@@ -8,6 +12,18 @@ export const config = {
   },
 }
 
+async function readBody(req) {
+  const chunks = []
+  for await (const chunk of req) {
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks)
+}
+
+/**
+ * Proxy upload through the Next server into Vercel Blob.
+ * Prefer `/api/admin/upload-url` + client upload — Vercel limits request bodies (~4.5MB).
+ */
 export default async function handler(req, res) {
   if (!isAdminAuthenticated(req)) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -35,19 +51,20 @@ export default async function handler(req, res) {
     }
 
     const key = createUploadKey({ filename: String(filename) })
-    const { fileUrl } = await uploadObject({
+    const body = await readBody(req)
+    const { fileUrl, key: pathname } = await uploadObject({
       key,
       contentType,
-      body: req,
+      body,
     })
 
     return res.status(200).json({
-      key,
+      key: pathname,
       fileUrl,
       url: fileUrl,
-      kind: String(contentType).startsWith('video/') ? 'video' : 'image',
+      kind: mediaKindFromContentType(contentType),
       contentType,
-      size: contentLength || undefined,
+      size: contentLength || body.length || undefined,
     })
   } catch (error) {
     return res.status(400).json({ error: error.message })

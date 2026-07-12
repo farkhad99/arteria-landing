@@ -17,8 +17,6 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1045.0",
-    "@aws-sdk/s3-request-presigner": "^3.1045.0",
     "@darkroom.engineering/hamo": "^0.6.46",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -28,6 +26,7 @@
     "@theatre/core": "^0.7.0",
     "@theatre/studio": "^0.7.0",
     "@vercel/analytics": "^1.1.1",
+    "@vercel/blob": "^2.6.1",
     "blaze-slider": "1.9.3",
     "clsx": "^2.1.0",
     "events": "^3.3.0",

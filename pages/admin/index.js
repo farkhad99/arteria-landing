@@ -3,7 +3,7 @@ import { ProjectSortList } from 'components/admin/project-sort-list'
 import { ProjectDrawer } from 'components/admin/project-drawer'
 import { ServiceSortList } from 'components/admin/service-sort-list'
 import { clearSessionCookie, isAdminAuthenticated } from 'lib/admin-auth'
-import { uploadFileToS3 } from 'lib/admin-s3-upload'
+import { uploadFileToBlob } from 'lib/admin-blob-upload'
 import { parseApiResponse } from 'lib/parse-api-response'
 import cn from 'clsx'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -198,7 +198,7 @@ export default function AdminPage({ authenticated }) {
     fetchServices()
   }
 
-  const uploadFile = useCallback((file) => uploadFileToS3(file), [])
+  const uploadFile = useCallback((file) => uploadFileToBlob(file), [])
 
   const openCreateDrawer = () => {
     setEditingId(null)

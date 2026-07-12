@@ -1,37 +1,46 @@
+import { handleUploadPresigned } from '@vercel/blob/client'
 import { isAdminAuthenticated } from 'lib/admin-auth'
-import { createUploadKey, createUploadUrl } from 'lib/aws-s3'
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from 'lib/upload-limits'
+import {
+  assertBlobConfigured,
+  clientUploadUrlOptions,
+  createPutSignedToken,
+} from 'lib/vercel-blob'
 
+/**
+ * Presigned client uploads for Vercel Blob (OIDC-compatible).
+ * Uses BLOB_STORE_ID + VERCEL_OIDC_TOKEN (and BLOB_WEBHOOK_PUBLIC_KEY for callbacks).
+ * Does not require BLOB_READ_WRITE_TOKEN.
+ */
 export default async function handler(req, res) {
-  if (!isAdminAuthenticated(req)) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const { filename, contentType, size } = req.body || {}
-    if (!filename || !contentType) {
-      return res.status(400).json({ error: 'filename and contentType are required' })
-    }
+    assertBlobConfigured()
 
-    if (typeof size === 'number' && size > MAX_UPLOAD_BYTES) {
-      return res.status(413).json({
-        error: `File exceeds maximum size of ${MAX_UPLOAD_LABEL}`,
-      })
-    }
+    const jsonResponse = await handleUploadPresigned({
+      body: req.body,
+      request: req,
+      getSignedToken: async (pathname) => {
+        if (!isAdminAuthenticated(req)) {
+          throw new Error('Unauthorized')
+        }
 
-    const key = createUploadKey({ filename })
-    const payload = await createUploadUrl({ key, contentType })
-
-    return res.status(200).json({
-      ...payload,
-      key,
-      url: payload.fileUrl,
+        return {
+          token: await createPutSignedToken(pathname),
+          urlOptions: clientUploadUrlOptions(),
+        }
+      },
+      onUploadCompleted: async () => {
+        // Browser already receives the blob URL from uploadPresigned().
+      },
     })
+
+    return res.status(200).json(jsonResponse)
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    const message = error?.message || 'Upload failed'
+    const status = message === 'Unauthorized' ? 401 : 400
+    return res.status(status).json({ error: message })
   }
 }

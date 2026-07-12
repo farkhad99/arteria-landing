@@ -1,11 +1,11 @@
 const path = require('path')
 const {
-  getS3ImageHostsFromEnv,
-  getS3RemotePatterns,
+  getMediaImageHostsFromEnv,
+  getMediaRemotePatterns,
 } = require('./lib/s3-image-hosts.cjs')
 
-const s3ImageHosts = getS3ImageHostsFromEnv()
-const s3RemotePatterns = getS3RemotePatterns()
+const mediaImageHosts = getMediaImageHostsFromEnv()
+const mediaRemotePatterns = getMediaRemotePatterns()
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({
 //   enabled: process.env.ANALYZE === 'true',
 // })
@@ -21,7 +21,7 @@ const nextConfig = {
   },
   images: {
     // Legacy allowlist — still respected by next/image in Next 14
-    domains: s3ImageHosts,
+    domains: mediaImageHosts,
     remotePatterns: [
       {
         protocol: 'https',
@@ -41,7 +41,7 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-      ...s3RemotePatterns,
+      ...mediaRemotePatterns,
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 30,
