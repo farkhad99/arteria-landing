@@ -11,11 +11,6 @@ const s3RemotePatterns = getS3RemotePatterns()
 // })
 
 const nextConfig = {
-  output: 'standalone',
-  // Standalone trace often omits sharp/@img — without them /_next/image returns originals at 200
-  outputFileTracingIncludes: {
-    '/*': ['./node_modules/sharp/**/*', './node_modules/@img/**/*'],
-  },
   reactStrictMode: true,
   transpilePackages: ['@studio-freight/compono'],
   experimental: {
