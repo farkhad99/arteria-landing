@@ -3,8 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon/Vercel pooler is fine for the app; migrations need a direct connection.
+  directUrl = env("DIRECT_URL")
 }
 
 model StudioService {
