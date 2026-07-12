@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/verify-image-config.js",
+    "build": "prisma generate && prisma migrate deploy && next build && node scripts/verify-image-config.js",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
