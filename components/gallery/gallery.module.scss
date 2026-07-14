@@ -27,16 +27,30 @@
 
     @include desktop {
       display: flex;
+      position: absolute;
+      z-index: 1;
+      left: 50%;
+      bottom: desktop-vh(128px);
       justify-content: center;
       align-items: center;
-      padding: desktop-vh(16px) 0 desktop-vh(8px);
       pointer-events: none;
+      transform: translateX(-50%);
+      opacity: 1;
+      transition: opacity 300ms var(--ease-out-expo),
+        transform 300ms var(--ease-out-expo);
+    }
+  }
+
+  .scrollHintHidden {
+    @include desktop {
+      opacity: 0;
+      transform: translate(-50%, desktop-vh(12px));
     }
   }
 
   .scrollHintIcon {
-    width: desktop-vw(36px);
-    height: desktop-vw(36px);
+    width: desktop-vw(52px);
+    height: desktop-vw(52px);
   }
 
   .close {

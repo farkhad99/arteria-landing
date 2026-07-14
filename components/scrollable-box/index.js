@@ -4,7 +4,13 @@ import cn from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 import s from './scrollable-box.module.scss'
 
-export function ScrollableBox({ children, className, infinite, reset }) {
+export function ScrollableBox({
+  children,
+  className,
+  infinite,
+  reset,
+  onScroll,
+}) {
   const [lenis, setLenis] = useState()
   const wrapperRef = useRef()
   const contentRef = useRef()
@@ -39,7 +45,7 @@ export function ScrollableBox({ children, className, infinite, reset }) {
   }, [reset])
 
   return (
-    <div className={cn(s.hi, className)} ref={wrapperRef}>
+    <div className={cn(s.hi, className)} ref={wrapperRef} onScroll={onScroll}>
       <div ref={contentRef}>{children}</div>
     </div>
   )

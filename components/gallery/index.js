@@ -3,11 +3,12 @@ import cn from 'clsx'
 import { ComposableImage } from 'components/composable-image'
 import { ScrollableBox } from 'components/scrollable-box'
 import { useStore } from 'lib/store'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import s from './gallery.module.scss'
 
 export function Gallery() {
   const contentRef = useRef(null)
+  const [hasScrolled, setHasScrolled] = useState(false)
   const [selectedProject, galleryVisible, setGalleryVisible] = useStore(
     (state) => [
       state.selectedProject,
@@ -17,7 +18,13 @@ export function Gallery() {
   )
 
   const assets = selectedProject?.assetsCollection?.items ?? []
-  const showScrollHint = galleryVisible && assets.length > 1
+  const showScrollHint = galleryVisible && !hasScrolled
+
+  useEffect(() => {
+    if (galleryVisible) {
+      setHasScrolled(false)
+    }
+  }, [galleryVisible, selectedProject])
 
   useOutsideClickEvent(contentRef, () => setGalleryVisible(false))
 
@@ -43,7 +50,15 @@ export function Gallery() {
         </svg>
         <span className={cn(s.text, 'p-xs text-uppercase')}>Close</span>
       </button>
-      <ScrollableBox className={s.scroller} reset={!galleryVisible}>
+      <ScrollableBox
+        className={s.scroller}
+        reset={!galleryVisible}
+        onScroll={(event) => {
+          if (event.currentTarget.scrollTop > 16) {
+            setHasScrolled(true)
+          }
+        }}
+      >
         <div ref={contentRef}>
           {galleryVisible &&
             assets.map((asset, i) => (
@@ -54,16 +69,17 @@ export function Gallery() {
                   priority={i === 0}
                   large
                 />
-                {i === 0 && showScrollHint && (
-                  <div className={s.scrollHint} aria-hidden>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/Arrow.svg" alt="" className={s.scrollHintIcon} />
-                  </div>
-                )}
               </div>
             ))}
         </div>
       </ScrollableBox>
+      <div
+        className={cn(s.scrollHint, !showScrollHint && s.scrollHintHidden)}
+        aria-hidden
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/Arrow.svg" alt="" className={s.scrollHintIcon} />
+      </div>
     </div>
   )
 }
