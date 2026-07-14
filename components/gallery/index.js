@@ -16,6 +16,9 @@ export function Gallery() {
     ],
   )
 
+  const assets = selectedProject?.assetsCollection?.items ?? []
+  const showScrollHint = galleryVisible && assets.length > 1
+
   useOutsideClickEvent(contentRef, () => setGalleryVisible(false))
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export function Gallery() {
 
     document.addEventListener('keydown', escFunction, false)
     return () => document.removeEventListener('keydown', escFunction, false)
-  }, [])
+  }, [setGalleryVisible])
 
   return (
     <div className={cn(s.gallery, galleryVisible && s.visible)}>
@@ -43,7 +46,7 @@ export function Gallery() {
       <ScrollableBox className={s.scroller} reset={!galleryVisible}>
         <div ref={contentRef}>
           {galleryVisible &&
-            selectedProject?.assetsCollection?.items.map((asset, i) => (
+            assets.map((asset, i) => (
               <div key={i}>
                 <ComposableImage
                   variant="gallery"
@@ -51,6 +54,12 @@ export function Gallery() {
                   priority={i === 0}
                   large
                 />
+                {i === 0 && showScrollHint && (
+                  <div className={s.scrollHint} aria-hidden>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/Arrow.svg" alt="" className={s.scrollHintIcon} />
+                  </div>
+                )}
               </div>
             ))}
         </div>

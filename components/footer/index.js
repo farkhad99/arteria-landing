@@ -8,7 +8,7 @@ import s from './footer.module.scss'
 export function Footer({ className, style }) {
   const isMobile = useIsMobile()
   const footerPhone = '+998996924479'
-  const footerEmail = 'segeayupov@gmail.com'
+  const footerEmail = 'sergeayupov@gmail.com'
 
   return (
     <footer className={s.container}>

@@ -7,11 +7,7 @@ import { Separator } from 'components/separator'
 import { SiteTitle } from 'components/site-title'
 import { pad } from 'lib/maths'
 import { useStore } from 'lib/store'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import s from './header.module.scss'
-
-const Stard = dynamic(() => import('icons/stard.svg'), { ssr: false })
 
 export const Header = ({ principles = [], contact }) => {
   const isMobile = useIsMobile()
@@ -26,15 +22,16 @@ export const Header = ({ principles = [], contact }) => {
     <header className={cn(s.container, 'layout-block')}>
       <div className={cn(s.top, 'layout-grid')}>
         <div className={s.eggs}>
-          <Link
-            name="X profile"
-            className={s.egg}
-            href="https://x.com/denkegut"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Stard />
-          </Link>
+          <span className={s.egg}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/android-chrome-512x512.png"
+              alt="Arteria"
+              className={s.logo}
+              width={24}
+              height={24}
+            />
+          </span>
         </div>
         {!isMobile && (
           <Marquee className={s.marquee} duration={20}>
